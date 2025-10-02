@@ -6,15 +6,18 @@ kanban-plugin: board
 
 ## Заказы
 
-- [ ] Шайбы трактор 200 шт
-- [ ] ЧелЗнак медали 15 шт
 
 
 ## В работе
 
+- [x] Трактор шайбы @{2025-10-16}
 
 
-## Готово
+## Сделано
+
+
+
+## Счет выставлен
 
 
 
@@ -22,6 +25,6 @@ kanban-plugin: board
 
 %% kanban:settings
 ```
-{"kanban-plugin":"board","list-collapse":[false,false,false],"move-tags":false}
+{"kanban-plugin":"board","list-collapse":[false,false,false,false],"move-tags":false,"show-checkboxes":false}
 ```
 %%
