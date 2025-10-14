@@ -1,3 +1,5 @@
+# Памятка: Работа с датой и временем в Python
+
 ## ⚡ БЫСТРАЯ ШПАРГАЛКА (самое нужное)
 
 ```python
@@ -14,10 +16,20 @@ datetime(2024, 12, 31, 23, 59, 59)          # дата и время
 # Из строки
 datetime.strptime('31.12.2024', '%d.%m.%Y')         # из строки
 datetime.fromisoformat('2024-12-31 23:59:59')       # из ISO
+date.fromisoformat('2024-12-31')                    # дата из ISO
 
 # В строку
 dt.strftime('%d.%m.%Y')                     # '31.12.2024'
 dt.strftime('%Y-%m-%d %H:%M:%S')            # '2024-12-31 23:59:59'
+
+# Timestamp (Unix время)
+dt.timestamp()                              # 1704063599.123456
+datetime.fromtimestamp(1704063599)          # из timestamp
+
+# Объединение и разделение
+datetime.combine(date(2024, 12, 31), time(23, 59))  # объединить дату и время
+dt.date()                                   # получить только дату
+dt.time()                                   # получить только время
 
 # Арифметика с датами
 today = date.today()
@@ -124,7 +136,9 @@ t.replace(minute=0)     # time(14, 0, 45)
 from datetime import datetime
 
 # Создание datetime
-now = datetime.now()                    # Текущие дата и время
+now = datetime.now()                    # Текущие дата и время (локальное)
+now = datetime.now(tz=timezone.utc)     # С указанием часового пояса
+utc_now = datetime.utcnow()             # UTC время (устарело, используй datetime.now(timezone.utc))
 dt = datetime(2024, 12, 31, 23, 59, 59) # Конкретные дата и время
 
 # Атрибуты (все от date + все от time)
@@ -136,9 +150,68 @@ dt.date()       # Получить только дату (объект date)
 dt.time()       # Получить только время (объект time)
 dt.weekday()    # День недели
 dt.isoformat()  # '2024-12-31T23:59:59' (строка ISO)
+dt.timestamp()  # 1704063599.123456 (Unix timestamp в секундах)
 
 # Замена значений
 dt.replace(year=2025, month=1, day=1)  # Новый datetime
+```
+
+#### Методы now() и today()
+
+```python
+from datetime import datetime, date, timezone
+
+# datetime.now() - текущие дата и время
+now = datetime.now()                        # Локальное время
+now = datetime.now(timezone.utc)            # UTC время
+now = datetime.now(timezone(timedelta(hours=3)))  # С часовым поясом +3
+
+# date.today() - только сегодняшняя дата
+today = date.today()                        # Только дата (без времени)
+
+# Разница
+print(datetime.now())   # 2024-12-31 23:59:59.123456
+print(date.today())     # 2024-12-31
+```
+
+#### Методы timestamp() и fromtimestamp()
+
+```python
+from datetime import datetime
+
+# timestamp() - преобразовать datetime в Unix timestamp
+dt = datetime(2024, 12, 31, 23, 59, 59)
+timestamp = dt.timestamp()              # 1704063599.0 (секунды с 1970-01-01)
+
+# fromtimestamp() - создать datetime из timestamp
+dt = datetime.fromtimestamp(1704063599)     # Локальное время
+dt = datetime.fromtimestamp(1704063599, tz=timezone.utc)  # UTC время
+
+# Примеры
+import time
+current_timestamp = time.time()             # Текущий timestamp
+dt = datetime.fromtimestamp(current_timestamp)
+```
+
+#### Метод combine() - объединение даты и времени
+
+```python
+from datetime import datetime, date, time
+
+# combine(date, time) - объединить дату и время
+d = date(2024, 12, 31)
+t = time(23, 59, 59)
+dt = datetime.combine(d, t)                 # datetime(2024, 12, 31, 23, 59, 59)
+
+# Примеры использования
+today = date.today()
+morning = time(9, 0)
+start_of_day = datetime.combine(today, morning)  # Сегодня в 9:00
+
+# С минимальным/максимальным временем
+from datetime import time
+start = datetime.combine(today, time.min)   # Сегодня 00:00:00
+end = datetime.combine(today, time.max)     # Сегодня 23:59:59.999999
 ```
 
 #### Создание datetime из строки
