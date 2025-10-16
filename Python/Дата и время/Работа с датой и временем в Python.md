@@ -490,13 +490,13 @@ mondays = get_mondays(2024, 12)
 
 ### 8. Сравнительная таблица
 
-|Операция|date|time|datetime|
-|---|---|---|---|
-|Создание текущего|`date.today()`|-|`datetime.now()`|
-|Атрибуты|year, month, day|hour, minute, second|все|
-|Арифметика|✅ (с timedelta)|❌|✅ (с timedelta)|
-|Сравнение|✅|✅|✅|
-|Форматирование|✅|✅|✅|
+|Операция|`date`|`time`|`datetime`|`timedelta`|
+|---|---|---|---|---|
+|**Создание текущего**|`date.today()`|-|`datetime.now()`|-|
+|**Атрибуты**|year, month, day|hour, minute, second|year, month, day, hour, minute, second|days, seconds, microseconds|
+|**Арифметика**|✅ (с timedelta)|❌|✅ (с timedelta)|✅ (между собой)|
+|**Сравнение**|✅|✅|✅|✅|
+|**Форматирование**|✅|✅|✅|❌ (только str())|
 
 ---
 
