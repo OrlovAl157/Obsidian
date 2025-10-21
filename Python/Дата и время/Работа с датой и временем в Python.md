@@ -70,7 +70,7 @@ date.fromordinal(738885)        # date(2024, 12, 31)
 '%d.%m.%Y %H:%M'    # 31.12.2024 23:59
 ```
 
----
+-----
 
 ## 📚 ПОДРОБНАЯ ДОКУМЕНТАЦИЯ
 
@@ -102,7 +102,7 @@ d.replace(month=1)      # date(2024, 1, 31)
 date.fromisoformat('2024-12-31')     # Из ISO формата
 ```
 
----
+-----
 
 ### 2. Тип данных time (время)
 
@@ -128,7 +128,7 @@ t.replace(hour=15)      # time(15, 30, 45)
 t.replace(minute=0)     # time(14, 0, 45)
 ```
 
----
+-----
 
 ### 3. Тип данных datetime (дата и время)
 
@@ -257,7 +257,7 @@ dt.strftime('%d/%m/%y')           # '31/12/24'
 %f - микросекунды       %j - день года (001-366)
 ```
 
----
+-----
 
 ### 4. Тип данных timedelta (интервал времени)
 
@@ -334,7 +334,7 @@ def calculate_age(birth_date):
     return age
 ```
 
----
+-----
 
 ### 5. Модуль time
 
@@ -374,7 +374,7 @@ time.strftime('%d.%m.%Y %H:%M:%S', time.localtime())
 time.strptime('31.12.2024', '%d.%m.%Y')
 ```
 
----
+-----
 
 ### 6. Модуль calendar
 
@@ -385,15 +385,15 @@ import calendar
 calendar.isleap(2024)           # True
 calendar.isleap(2023)           # False
 
+# Количество високосных лет в диапазоне
+calendar.leapdays(2020, 2025)   # 2 (годы 2020 и 2024)
+
+# День недели для даты (0-пн, 6-вс)
+calendar.weekday(2024, 12, 31)  # 1 (вторник)
+
 # Количество дней в месяце
 calendar.monthrange(2024, 2)    # (3, 29) - (день недели 1-го числа, кол-во дней)
 calendar.monthrange(2024, 2)[1] # 29 дней
-
-# Текстовый календарь месяца
-print(calendar.month(2024, 12))
-
-# Календарь года
-print(calendar.calendar(2024))
 
 # Матрица дней месяца
 calendar.monthcalendar(2024, 12)
@@ -402,15 +402,107 @@ calendar.monthcalendar(2024, 12)
 #  ...
 #  [30, 31, 0, 0, 0, 0, 0]]
 
-# Названия дней недели и месяцев
-calendar.day_name[0]        # 'Monday'
-calendar.month_name[1]      # 'January'
+# Текстовый календарь месяца
+print(calendar.month(2024, 12))
+calendar.prmonth(2024, 12)      # То же самое
 
-# Установка первого дня недели (0 - понедельник, 6 - воскресенье)
-calendar.setfirstweekday(calendar.SUNDAY)
+# Календарь года
+print(calendar.calendar(2024))
+calendar.prcal(2024)            # То же самое
 ```
 
----
+#### Атрибуты - названия дней и месяцев
+
+```python
+import calendar
+
+# Названия дней недели
+calendar.day_name[0]            # 'Monday'
+calendar.day_name[6]            # 'Sunday'
+list(calendar.day_name)         # ['Monday', 'Tuesday', ...]
+
+# Сокращенные названия дней
+calendar.day_abbr[0]            # 'Mon'
+list(calendar.day_abbr)         # ['Mon', 'Tue', 'Wed', ...]
+
+# Названия месяцев (индексация с 1!)
+calendar.month_name[1]          # 'January'
+calendar.month_name[12]         # 'December'
+list(calendar.month_name)       # ['', 'January', 'February', ...]
+
+# Сокращенные названия месяцев
+calendar.month_abbr[1]          # 'Jan'
+list(calendar.month_abbr)       # ['', 'Jan', 'Feb', ...]
+
+# Константы дней недели
+calendar.MONDAY                 # 0
+calendar.TUESDAY                # 1
+calendar.SUNDAY                 # 6
+```
+
+#### Изменение первого дня недели
+
+```python
+import calendar
+
+# По умолчанию понедельник = 0
+calendar.firstweekday()         # 0
+
+# Установить воскресенье как первый день
+calendar.setfirstweekday(calendar.SUNDAY)
+calendar.firstweekday()         # 6
+
+# Вернуть понедельник
+calendar.setfirstweekday(calendar.MONDAY)
+```
+
+#### Локализация на русский язык
+
+```python
+import calendar, locale
+
+# Установить русскую локаль
+locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+
+# Теперь названия на русском
+list(calendar.day_name)         # ['понедельник', 'вторник', ...]
+list(calendar.day_abbr)         # ['Пн', 'Вт', 'Ср', ...]
+list(calendar.month_name)       # ['', 'Январь', 'Февраль', ...]
+list(calendar.month_abbr)       # ['', 'янв', 'фев', ...]
+
+# Календарь на русском
+calendar.prmonth(2024, 12)
+
+# С заглавной буквы (для дней недели)
+[name.title() for name in calendar.day_name]
+```
+
+#### Параметры функций month() и calendar()
+
+```python
+import calendar
+
+# month(year, month, w=0, l=0)
+# w - ширина столбца даты
+# l - количество строк на неделю
+
+calendar.month(2024, 12)            # По умолчанию
+calendar.month(2024, 12, w=3)       # Шире столбцы
+calendar.month(2024, 12, l=2)       # Больше строк
+calendar.month(2024, 12, w=5, l=2)  # И то, и то
+
+# calendar(year, w=2, l=1, c=6, m=3)
+# w - ширина столбца даты
+# l - количество строк на неделю
+# c - количество пробелов между месяцами
+# m - количество столбцов (месяцев в ряд)
+
+calendar.calendar(2024)             # По умолчанию (3 месяца в ряд)
+calendar.calendar(2024, m=4)        # 4 месяца в ряд
+calendar.calendar(2024, m=2)        # 2 месяца в ряд
+```
+
+-----
 
 ### 7. Практические примеры
 
@@ -486,19 +578,19 @@ def get_mondays(year, month):
 mondays = get_mondays(2024, 12)
 ```
 
----
+-----
 
 ### 8. Сравнительная таблица
 
-|Операция|`date`|`time`|`datetime`|`timedelta`|
-|---|---|---|---|---|
-|**Создание текущего**|`date.today()`|-|`datetime.now()`|-|
-|**Атрибуты**|year, month, day|hour, minute, second|year, month, day, hour, minute, second|days, seconds, microseconds|
-|**Арифметика**|✅ (с timedelta)|❌|✅ (с timedelta)|✅ (между собой)|
-|**Сравнение**|✅|✅|✅|✅|
-|**Форматирование**|✅|✅|✅|❌ (только str())|
+|Операция         |date            |time                |datetime        |
+|-----------------|----------------|--------------------|----------------|
+|Создание текущего|`date.today()`  |-                   |`datetime.now()`|
+|Атрибуты         |year, month, day|hour, minute, second|все             |
+|Арифметика       |✅ (с timedelta) |❌                   |✅ (с timedelta) |
+|Сравнение        |✅               |✅                   |✅               |
+|Форматирование   |✅               |✅                   |✅               |
 
----
+-----
 
 ## 💡 Полезные советы
 
