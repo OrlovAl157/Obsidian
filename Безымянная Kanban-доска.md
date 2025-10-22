@@ -8,7 +8,11 @@ kanban-plugin: board
 
 
 
-## В изучении
+## В процессе изучении
+
+
+
+## Изучил
 
 
 
@@ -16,6 +20,6 @@ kanban-plugin: board
 
 %% kanban:settings
 ```
-{"kanban-plugin":"board","list-collapse":[false,false]}
+{"kanban-plugin":"board","list-collapse":[false,false,false]}
 ```
 %%
