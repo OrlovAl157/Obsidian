@@ -1,0 +1,389 @@
+
+## 📋 Быстрая справка: Основные методы
+
+|Метод         |Назначение                                 |Работает с|Пример использования    |
+|--------------|-------------------------------------------|----------|------------------------|
+|`json.dumps()`|Сериализует Python-объект в JSON-строку    |Строка    |`s = json.dumps(data)`  |
+|`json.dump()` |Записывает Python-объект в JSON-файл       |Файл      |`json.dump(data, file)` |
+|`json.loads()`|Десериализует JSON-строку в Python-объект  |Строка    |`data = json.loads(s)`  |
+|`json.load()` |Читает JSON-файл и возвращает Python-объект|Файл      |`data = json.load(file)`|
+
+### 🔑 Ключевые параметры функций
+
+|Параметр      |По умолчанию  |Описание                       |Пример                      |
+|--------------|--------------|-------------------------------|----------------------------|
+|`indent`      |`None`        |Отступ для форматирования      |`indent=4` или `indent='  '`|
+|`sort_keys`   |`False`       |Сортировка ключей по алфавиту  |`sort_keys=True`            |
+|`ensure_ascii`|`True`        |Экранирование не-ASCII символов|`ensure_ascii=False`        |
+|`skipkeys`    |`False`       |Пропуск несериализуемых ключей |`skipkeys=True`             |
+|`separators`  |`(', ', ': ')`|Разделители элементов и ключей |`separators=(';', ' = ')`   |
+
+-----
+
+## 📚 Теория
+
+### Что такое JSON?
+
+**JSON** (JavaScript Object Notation) — текстовый формат обмена данными, основанный на JavaScript, но независимый от языка программирования.
+
+**Преимущества JSON:**
+
+- ✅ Компактный и легко читаемый человеком
+- ✅ Поддерживается практически всеми языками программирования
+- ✅ Идеален для сериализации сложных структур данных
+- ✅ Широко используется в веб-приложениях и API
+- ✅ Быстрая компиляция и парсинг
+
+-----
+
+## 🔤 Синтаксис JSON
+
+### Базовая структура (ключ-значение)
+
+```json
+{
+   "firstName": "Тимур",
+   "lastName": "Гуев",
+   "age": 29,
+   "gender": "мужской"
+}
+```
+
+### Вложенные объекты и списки
+
+```json
+{
+   "firstName": "Тимур",
+   "lastName": "Гуев",
+   "age": 29,
+   "smoke": false,
+   "address": {
+       "streetAddress": "Часовая 25, кв. 127",
+       "city": "Москва",
+       "postalCode": 125315
+   },
+   "phoneNumbers": ["+7 (919) 424-84-34", "+7 (916) 928-92-34"]
+}
+```
+
+### Типы данных в JSON
+
+|Тип JSON |Пример            |Описание                    |
+|---------|------------------|----------------------------|
+|`string` |`"текст"`         |Строка в двойных кавычках   |
+|`number` |`42`, `3.14`      |Целое или вещественное число|
+|`boolean`|`true`, `false`   |Логические значения         |
+|`null`   |`null`            |Отсутствие значения         |
+|`array`  |`[1, 2, 3]`       |Список значений             |
+|`object` |`{"key": "value"}`|Объект (словарь)            |
+
+**⚠️ Важно:**
+
+- В JSON используются **только двойные кавычки** `""`
+- Переносы строк и отступы необязательны (нужны для читаемости)
+
+-----
+
+## 🔄 Таблицы преобразования типов
+
+### Python → JSON
+
+|Python |JSON    |Примечание      |
+|-------|--------|----------------|
+|`dict` |`object`|Словарь → объект|
+|`list` |`array` |Список → массив |
+|`tuple`|`array` |Кортеж → массив |
+|`str`  |`string`|Строка → строка |
+|`int`  |`number`|Целое → число   |
+|`float`|`number`|Дробное → число |
+|`True` |`true`  |Булево → булево |
+|`False`|`false` |Булево → булево |
+|`None` |`null`  |Пустое → null   |
+
+### JSON → Python
+
+|JSON           |Python |
+|---------------|-------|
+|`object`       |`dict` |
+|`array`        |`list` |
+|`string`       |`str`  |
+|`number (int)` |`int`  |
+|`number (real)`|`float`|
+|`true`         |`True` |
+|`false`        |`False`|
+|`null`         |`None` |
+
+-----
+
+## 💻 Практические примеры
+
+### 1. Сериализация: Python → JSON-строка
+
+```python
+import json
+
+# Создаем словарь
+data = {
+    'name': 'Russia',
+    'phone_code': 7,
+    'capital': 'Moscow',
+    'currency': 'RUB'
+}
+
+# Преобразуем в JSON-строку
+json_data = json.dumps(data)
+print(json_data)
+# {"name": "Russia", "phone_code": 7, "capital": "Moscow", "currency": "RUB"}
+```
+
+### 2. Форматированная запись с параметрами
+
+```python
+import json
+
+data = {'name': 'Russia', 'phone_code': 7, 'capital': 'Moscow', 'currency': 'RUB'}
+
+# С отступами и сортировкой ключей
+json_data = json.dumps(data, indent=4, sort_keys=True)
+print(json_data)
+```
+
+**Результат:**
+
+```json
+{
+    "capital": "Moscow",
+    "currency": "RUB",
+    "name": "Russia",
+    "phone_code": 7
+}
+```
+
+### 3. Запись в файл
+
+```python
+import json
+
+data = {'name': 'Russia', 'phone_code': 7, 'capital': 'Moscow'}
+
+# Записываем в файл с красивым форматированием
+with open('countries.json', 'w', encoding='utf-8') as file:
+    json.dump(data, file, indent=4, ensure_ascii=False)
+```
+
+### 4. Десериализация: JSON-строка → Python
+
+```python
+import json
+
+json_data = '{"name": "Russia", "phone_code": 7, "capital": "Moscow"}'
+
+# Преобразуем JSON-строку в словарь
+data = json.loads(json_data)
+print(type(data))  # <class 'dict'>
+print(data['name'])  # Russia
+```
+
+### 5. Чтение из файла
+
+```python
+import json
+
+# Читаем JSON из файла
+with open('data.json', 'r', encoding='utf-8') as file:
+    data = json.load(file)
+    
+# Работаем с данными
+for key, value in data.items():
+    print(f'{key}: {value}')
+```
+
+### 6. Работа с русским текстом
+
+```python
+import json
+
+data = {'firstName': 'Тимур', 'lastName': 'Гуев'}
+
+# По умолчанию (с экранированием)
+s1 = json.dumps(data)
+print(s1)
+# {"firstName": "\u0422\u0438\u043c\u0443\u0440", "lastName": "\u0413\u0443\u0435\u0432"}
+
+# Без экранирования кириллицы
+s2 = json.dumps(data, ensure_ascii=False)
+print(s2)
+# {"firstName": "Тимур", "lastName": "Гуев"}
+```
+
+### 7. Пользовательские разделители
+
+```python
+import json
+
+data = {'name': 'Russia', 'phone_code': 7, 'capital': 'Moscow'}
+
+json_data = json.dumps(data, indent=3, separators=('; ', ' = '))
+print(json_data)
+```
+
+**Результат:**
+
+```json
+{
+   "name" = "Russia";
+   "phone_code" = 7;
+   "capital" = "Moscow"
+}
+```
+
+-----
+
+## ⚠️ Важные ограничения и особенности
+
+### 1. Ключи словаря
+
+**❌ Нельзя использовать кортежи как ключи:**
+
+```python
+data = {('Timur', 'Guev'): 29}  # TypeError!
+json.dumps(data)
+```
+
+**✅ Решение: использовать `skipkeys=True`**
+
+```python
+data = {('Timur', 'Guev'): 29, 'name': 'Timur'}
+json.dumps(data, skipkeys=True)  # {"name": "Timur"}
+```
+
+**⚠️ Числовые ключи преобразуются в строки:**
+
+```python
+data = {1: 'Timur', False: 'Arthur', None: 'Ruslan'}
+json.dumps(data)
+# {"1": "Timur", "false": "Arthur", "null": "Ruslan"}
+```
+
+### 2. Кортежи становятся списками
+
+```python
+data = {'timezones': ('Anadyr', 'Moscow', 'Kirov')}
+json_data = json.dumps(data)
+new_data = json.loads(json_data)
+
+print(data == new_data)  # False
+print(type(new_data['timezones']))  # <class 'list'>
+```
+
+### 3. Обработка ошибок
+
+```python
+import json
+
+try:
+    # Неверный JSON
+    json_data = '{"name":, "Russia"}'
+    data = json.loads(json_data)
+except json.decoder.JSONDecodeError as e:
+    print(f"Ошибка парсинга JSON: {e}")
+```
+
+-----
+
+## 🎯 Лучшие практики
+
+### ✅ Рекомендуется
+
+1. **Всегда указывать кодировку UTF-8:**
+   
+   ```python
+   with open('data.json', 'w', encoding='utf-8') as file:
+       json.dump(data, file)
+   ```
+2. **Использовать `ensure_ascii=False` для кириллицы:**
+   
+   ```python
+   json.dumps(data, ensure_ascii=False)
+   ```
+3. **Форматировать для читаемости:**
+   
+   ```python
+   json.dump(data, file, indent=4, sort_keys=True)
+   ```
+4. **Обрабатывать исключения:**
+   
+   ```python
+   try:
+       data = json.loads(json_string)
+   except json.JSONDecodeError:
+       print("Неверный формат JSON")
+   ```
+
+### ❌ Не рекомендуется
+
+- ❌ Использовать кортежи или сложные объекты как ключи
+- ❌ Забывать про кодировку при работе с файлами
+- ❌ Открывать файлы без контекстного менеджера `with`
+- ❌ Игнорировать возможные ошибки парсинга
+
+-----
+
+## 🔍 Сравнение dumps/dump и loads/load
+
+|Аспект       |`dumps()` / `loads()`      |`dump()` / `load()`       |
+|-------------|---------------------------|--------------------------|
+|Работает с   |Строками                   |Файлами                   |
+|Аргумент     |Python-объект / JSON-строка|Python-объект, файл / файл|
+|Возвращает   |JSON-строка / Python-объект|Ничего / Python-объект    |
+|Использование|В памяти                   |Сохранение/чтение файлов  |
+
+**Мнемоника:**
+
+- **s** в конце = **string** (строка)
+- без **s** = **file** (файл)
+
+-----
+
+## 📝 Сводная шпаргалка
+
+```python
+import json
+
+# СЕРИАЛИЗАЦИЯ (Python → JSON)
+# В строку
+json_string = json.dumps(data, indent=4, ensure_ascii=False, sort_keys=True)
+
+# В файл
+with open('file.json', 'w', encoding='utf-8') as f:
+    json.dump(data, f, indent=4, ensure_ascii=False)
+
+# ДЕСЕРИАЛИЗАЦИЯ (JSON → Python)
+# Из строки
+data = json.loads(json_string)
+
+# Из файла
+with open('file.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+```
+
+-----
+
+## 🌐 Полезные ссылки
+
+- **Официальная документация Python:** [docs.python.org/3/library/json.html](https://docs.python.org/3/library/json.html)
+- **Спецификация JSON:** [json.org](https://www.json.org/)
+- **JSON форматтер онлайн:** Для проверки и форматирования JSON
+
+-----
+
+## 💡 Запомнить
+
+1. **JSON** — текстовый формат для обмена данными
+2. Модуль **`json`** — встроенный в Python
+3. **Сериализация** — Python → JSON (dumps, dump)
+4. **Десериализация** — JSON → Python (loads, load)
+5. Всегда используйте **UTF-8** и **ensure_ascii=False** для кириллицы
+6. JSON использует только **двойные кавычки**
+7. **Кортежи** преобразуются в **списки**
+8. Обрабатывайте **JSONDecodeError** при парсинге
