@@ -36,7 +36,7 @@
 | Очистить           | `.clear()`                        | `set.clear()`        |
 | Длина              | `len()`                           | `len(set)`           |
 | Проверить наличие  | `in`                              | `5 in set`           |
-| Объединение        | `+` или `.union()`                | `set1 & set2`        |
+| Объединение        | `+` или `.union()`                | `set1 + set2`        |
 | Пересечение        | `&` или `.intersection()`         | `set1 & set2`        |
 | Разность           | `-` или `.difference()`           | `set1 - set2`        |
 | Симм. разность     | `^` или `.symmetric_difference()` | `set1 ^ set2`        |
