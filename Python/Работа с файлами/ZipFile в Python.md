@@ -2,22 +2,22 @@
 
 ## Таблица методов ZipFile
 
-|                     Метод                      |              Описание              |          Пример использования           |
-| :--------------------------------------------: | :--------------------------------: | :-------------------------------------: |
+| Метод                                          |              Описание              |          Пример использования           |
+| :--------------------------------------------- | :--------------------------------: | :-------------------------------------: |
 | `ZipFile(file, mode, compression, allowZip64)` |       Открыть/создать архив        | `ZipFile('arc.zip', 'w', ZIP_DEFLATED)` |
-|   `.write(filename, arcname, compress_type)`   |       Добавить файл в архив        |   `zipf.write('file.txt', 'new.txt')`   |
-|   `.writestr(filename, data, compress_type)`   |      Записать данные напрямую      |    `zipf.writestr('f.txt', 'text')`     |
-|               `.read(name, pwd)`               |  Прочитать файл из архива (bytes)  |     `data = zipf.read('file.txt')`      |
-|            `.open(name, mode, pwd)`            |       Открыть файл как поток       |     `with zipf.open('f.txt') as f:`     |
-|         `.extract(member, path, pwd)`          |         Извлечь один файл          |   `zipf.extract('file.txt', 'out/')`    |
-|       `.extractall(path, members, pwd)`        |         Извлечь все файлы          |      `zipf.extractall('folder/')`       |
-|                 `.namelist()`                  |      Список имен всех файлов       |        `files = zipf.namelist()`        |
-|                 `.infolist()`                  | Детальная информация о всех файлах |        `info = zipf.infolist()`         |
-|                `.getinfo(name)`                |   Информация о конкретном файле    |    `info = zipf.getinfo('file.txt')`    |
-|                  `.testzip()`                  |    Проверить целостность архива    |        `result = zipf.testzip()`        |
-|              `.setpassword(pwd)`               |    Установить пароль для чтения    |       `zipf.setpassword(b'pass')`       |
-|                 `.printdir()`                  |    Вывести содержимое в консоль    |            `zipf.printdir()`            |
-|                   `.close()`                   |           Закрыть архив            |             `zipf.close()`              |
+| `.write(filename, arcname, compress_type)`     |       Добавить файл в архив        |   `zipf.write('file.txt', 'new.txt')`   |
+| `.writestr(filename, data, compress_type)`     |      Записать данные напрямую      |    `zipf.writestr('f.txt', 'text')`     |
+| `.read(name, pwd)`                             |  Прочитать файл из архива (bytes)  |     `data = zipf.read('file.txt')`      |
+| `.open(name, mode, pwd)`                       |       Открыть файл как поток       |     `with zipf.open('f.txt') as f:`     |
+| `.extract(member, path, pwd)`                  |         Извлечь один файл          |   `zipf.extract('file.txt', 'out/')`    |
+| `.extractall(path, members, pwd)`              |         Извлечь все файлы          |      `zipf.extractall('folder/')`       |
+| `.namelist()`                                  |      Список имен всех файлов       |        `files = zipf.namelist()`        |
+| `.infolist()`                                  | Детальная информация о всех файлах |        `info = zipf.infolist()`         |
+| `.getinfo(name)`                               |   Информация о конкретном файле    |    `info = zipf.getinfo('file.txt')`    |
+| `.testzip()`                                   |    Проверить целостность архива    |        `result = zipf.testzip()`        |
+| `.setpassword(pwd)`                            |    Установить пароль для чтения    |       `zipf.setpassword(b'pass')`       |
+| `.printdir()`                                  |    Вывести содержимое в консоль    |            `zipf.printdir()`            |
+| `.close()`                                     |           Закрыть архив            |             `zipf.close()`              |
 
 ## Функции модуля zipfile
 
