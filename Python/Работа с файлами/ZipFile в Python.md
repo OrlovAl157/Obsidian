@@ -1,15 +1,15 @@
 
 ## 📋 Быстрая справка: Основные методы
 
-| Метод | Назначение | Пример |
-|-------|-----------|--------|
-| `ZipFile(file, mode)` | Открыть/создать архив | `ZipFile('arc.zip', 'w')` |
-| `.write(file, arcname)` | Добавить файл | `zipf.write('file.txt')` |
-| `.extractall(path, members)` | Распаковать всё | `zipf.extractall('folder')` |
-| `.extract(file, path, pwd)` | Распаковать один | `zipf.extract('file.txt')` |
-| `.read(file, pwd)` | Прочитать (bytes) | `zipf.read('file.txt')` |
-| `.namelist()` | Список файлов | `files = zipf.namelist()` |
-| `.writestr(name, data)` | Записать данные | `zipf.writestr('f.txt', 'text')` |
+| Метод                        | Назначение            | Пример                           |
+| ---------------------------- | --------------------- | -------------------------------- |
+| `ZipFile(file, mode)`        | Открыть/создать архив | `ZipFile('arc.zip', 'w')`        |
+| `.write(file, arcname)`      | Добавить файл         | `zipf.write('file.txt')`         |
+| `.extractall(path, members)` | Распаковать всё       | `zipf.extractall('folder')`      |
+| `.extract(file, path, pwd)`  | Распаковать один      | `zipf.extract('file.txt')`       |
+| `.read(file, pwd)`           | Прочитать (bytes)     | `zipf.read('file.txt')`          |
+| `.namelist()`                | Список файлов         | `files = zipf.namelist()`        |
+| `.writestr(name, data)`      | Записать данные       | `zipf.writestr('f.txt', 'text')` |
 
 ## 🔑 Параметры ZipFile
 
