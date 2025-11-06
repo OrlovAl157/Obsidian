@@ -1,219 +1,124 @@
-# 🗜️ Памятка по работе с ZIP файлами в Python
 
 ## 📋 Быстрая справка: Основные методы
 
-| Метод | Назначение | Режим | Пример использования |
-|-------|-----------|-------|---------------------|
-| `ZipFile(file, 'w')` | Создать новый архив | Запись | `with ZipFile('arc.zip', 'w') as z:` |
-| `ZipFile(file, 'r')` | Открыть для чтения | Чтение | `with ZipFile('arc.zip', 'r') as z:` |
-| `ZipFile(file, 'a')` | Добавить в архив | Добавление | `with ZipFile('arc.zip', 'a') as z:` |
-| `.write(file)` | Добавить файл в архив | Запись | `zipf.write('file.txt')` |
-| `.extractall(path)` | Распаковать весь архив | Чтение | `zipf.extractall('folder')` |
-| `.extract(file)` | Распаковать один файл | Чтение | `zipf.extract('file.txt')` |
-| `.read(file)` | Прочитать файл (bytes) | Чтение | `data = zipf.read('file.txt')` |
-| `.namelist()` | Список файлов в архиве | Чтение | `files = zipf.namelist()` |
+| Метод | Назначение | Пример |
+|-------|-----------|--------|
+| `ZipFile(file, mode)` | Открыть/создать архив | `ZipFile('arc.zip', 'w')` |
+| `.write(file, arcname)` | Добавить файл | `zipf.write('file.txt')` |
+| `.extractall(path, members)` | Распаковать всё | `zipf.extractall('folder')` |
+| `.extract(file, path, pwd)` | Распаковать один | `zipf.extract('file.txt')` |
+| `.read(file, pwd)` | Прочитать (bytes) | `zipf.read('file.txt')` |
+| `.namelist()` | Список файлов | `files = zipf.namelist()` |
+| `.writestr(name, data)` | Записать данные | `zipf.writestr('f.txt', 'text')` |
 
-## 🔑 Ключевые параметры ZipFile
+## 🔑 Параметры ZipFile
 
 | Параметр | По умолчанию | Описание | Пример |
 |----------|--------------|----------|--------|
-| `mode` | 'r' | Режим открытия ('r', 'w', 'a', 'x') | `mode='w'` |
-| `compression` | ZIP_STORED | Метод сжатия | `compression=zipfile.ZIP_DEFLATED` |
-| `compresslevel` | None | Уровень сжатия (0-9) | `compresslevel=9` |
-| `allowZip64` | True | Поддержка больших файлов (>2GB) | `allowZip64=True` |
+| `mode` | 'r' | Режим: 'r', 'w', 'a', 'x' | `mode='w'` |
+| `compression` | ZIP_STORED | Метод сжатия | `ZIP_DEFLATED` |
+| `compresslevel` | None | Уровень (0-9) | `compresslevel=9` |
 
-## 📚 Теория
+**Методы сжатия:**
+- `ZIP_STORED` (0) — без сжатия
+- `ZIP_DEFLATED` (8) — стандарт ⭐
+- `ZIP_BZIP2` (12) — сильное сжатие
+- `ZIP_LZMA` (14) — максимальное сжатие
 
-### Что такое ZIP?
+## 💻 Примеры
 
-**ZIP** — формат сжатия и архивирования данных. Позволяет объединить несколько файлов в один архив с возможностью сжатия.
-
-**Преимущества ZIP:**
-
-✅ Широкая поддержка на всех платформах  
-✅ Возможность сжатия данных  
-✅ Чтение файлов без полной распаковки  
-✅ Поддержка защиты паролем  
-✅ Сохранение структуры папок  
-✅ Встроенный модуль `zipfile` в Python
-
-### 🔤 Режимы открытия архива
-
-| Режим | Название | Описание | Что происходит с существующим файлом |
-|-------|----------|----------|-------------------------------------|
-| `'r'` | Read | Чтение | Открывается для чтения |
-| `'w'` | Write | Запись | Создается новый (старый удаляется) |
-| `'a'` | Append | Добавление | Добавляется к существующему |
-| `'x'` | Exclusive | Эксклюзивное создание | Ошибка, если уже существует |
-
-### 🗜️ Методы сжатия
-
-| Константа | Значение | Описание | Скорость | Степень сжатия |
-|-----------|----------|----------|----------|----------------|
-| `ZIP_STORED` | 0 | Без сжатия | ⚡⚡⚡ Быстро | ❌ Нет |
-| `ZIP_DEFLATED` | 8 | Стандартное (DEFLATE) | ⚡⚡ Средне | ✅ Хорошо |
-| `ZIP_BZIP2` | 12 | BZIP2 | ⚡ Медленно | ✅✅ Отлично |
-| `ZIP_LZMA` | 14 | LZMA | 🐌 Очень медленно | ✅✅✅ Максимум |
-
-⚠️ **Важно:** `ZIP_DEFLATED` — наиболее используемый метод (баланс скорости и сжатия)
-
-## 💻 Практические примеры
-
-### 1. Создание архива (один файл)
+### Создание архива
 
 ```python
 import zipfile
 
-# Создать архив и добавить файл
+# Один файл
 with zipfile.ZipFile('archive.zip', 'w') as zipf:
-    zipf.write('document.txt')
-```
+    zipf.write('file.txt')
 
-### 2. Создание архива (несколько файлов)
+# Несколько файлов с сжатием
+with zipfile.ZipFile('archive.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
+    zipf.write('file1.txt')
+    zipf.write('file2.txt')
+    zipf.write('data/file3.csv', arcname='file3.csv')  # переименовать
 
-```python
-import zipfile
-
-files = ['file1.txt', 'file2.txt', 'data.csv']
-
-with zipfile.ZipFile('archive.zip', 'w', compression=zipfile.ZIP_DEFLATED) as zipf:
-    for file in files:
-        zipf.write(file)
-```
-
-### 3. Создание архива с переименованием
-
-```python
-import zipfile
-
-# Файл будет сохранен под другим именем в архиве
-with zipfile.ZipFile('archive.zip', 'w') as zipf:
-    zipf.write('path/to/file.txt', arcname='renamed.txt')
-```
-
-### 4. Архивирование целой папки (рекурсивно)
-
-```python
-import zipfile
+# Архивировать папку
 import os
 
 def zip_folder(folder_path, output_zip):
-    """Архивирует папку со всеми подпапками"""
     with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for root, dirs, files in os.walk(folder_path):
             for file in files:
                 file_path = os.path.join(root, file)
-                # Относительный путь в архиве
                 arcname = os.path.relpath(file_path, folder_path)
                 zipf.write(file_path, arcname)
-
-# Использование
-zip_folder('my_project', 'project.zip')
 ```
 
-### 5. Распаковка всего архива
+### Распаковка
 
 ```python
-import zipfile
-
-# Распаковать все файлы
+# Распаковать всё
 with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    zipf.extractall('extracted_folder')
+    zipf.extractall('output')
+
+# Распаковать конкретные файлы (members)
+with zipfile.ZipFile('archive.zip', 'r') as zipf:
+    zipf.extractall('output', members=['file1.txt', 'file2.txt'])
+
+# Один файл
+with zipfile.ZipFile('archive.zip', 'r') as zipf:
+    zipf.extract('file.txt', path='output')
 ```
 
-### 6. Распаковка конкретного файла
+### Чтение без распаковки
 
 ```python
-import zipfile
-
-# Распаковать только один файл
+# Прочитать в память
 with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    zipf.extract('document.txt', path='output')
-```
+    content = zipf.read('file.txt')  # bytes
+    text = content.decode('utf-8')   # str
 
-### 7. Чтение файла без распаковки
-
-```python
-import zipfile
-
-# Прочитать содержимое в память
+# Построчно
 with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    content = zipf.read('document.txt')  # bytes
-    text = content.decode('utf-8')       # str
-    print(text)
-```
-
-### 8. Построчное чтение файла из архива
-
-```python
-import zipfile
-
-# Открыть файл как file-like объект
-with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    with zipf.open('document.txt') as f:
+    with zipf.open('file.txt') as f:
         for line in f:
-            print(line.decode('utf-8').strip())
+            print(line.decode('utf-8'))
 ```
 
-### 9. Просмотр содержимого архива
+### Просмотр содержимого
 
 ```python
-import zipfile
-
-# Получить список всех файлов
+# Список файлов
 with zipfile.ZipFile('archive.zip', 'r') as zipf:
     files = zipf.namelist()
-    print(files)
-    # ['file1.txt', 'folder/file2.txt', 'data.csv']
-```
+    print(files)  # ['file1.txt', 'folder/file2.txt']
 
-### 10. Детальная информация о файлах
-
-```python
-import zipfile
-
+# Детальная информация
 with zipfile.ZipFile('archive.zip', 'r') as zipf:
     for info in zipf.infolist():
-        print(f"Файл: {info.filename}")
-        print(f"Размер: {info.file_size} байт")
-        print(f"Сжат до: {info.compress_size} байт")
-        print(f"Сжатие: {100 - (info.compress_size / info.file_size * 100):.1f}%")
-        print(f"Дата: {info.date_time}")
-        print("-" * 50)
+        print(f"{info.filename}: {info.file_size} → {info.compress_size} байт")
+        print(f"Сжатие: {100 - (info.compress_size/info.file_size*100):.1f}%")
 ```
 
-### 11. Добавление файлов в существующий архив
+### Добавление в существующий
 
 ```python
-import zipfile
-
-# Режим 'a' (append) - добавление
+# Режим 'a' (append)
 with zipfile.ZipFile('archive.zip', 'a') as zipf:
     zipf.write('new_file.txt')
 ```
 
-### 12. Запись данных напрямую в архив
+### Запись данных напрямую
 
 ```python
-import zipfile
-
-# Создать файл в архиве без создания на диске
+# Без создания файла на диске
 with zipfile.ZipFile('archive.zip', 'w') as zipf:
-    zipf.writestr('generated.txt', 'Это сгенерированный текст')
-    
-    # С указанием метаданных
-    import time
-    info = zipfile.ZipInfo('my_file.txt')
-    info.date_time = time.localtime()[:6]
-    info.compress_type = zipfile.ZIP_DEFLATED
-    zipf.writestr(info, 'Содержимое файла')
+    zipf.writestr('generated.txt', 'Это текст')
 ```
 
-### 13. Работа с паролями
+### Работа с паролями
 
 ```python
-import zipfile
-
 # Чтение защищенного архива
 with zipfile.ZipFile('protected.zip', 'r') as zipf:
     zipf.setpassword(b'password123')
@@ -222,241 +127,62 @@ with zipfile.ZipFile('protected.zip', 'r') as zipf:
 # Распаковка с паролем
 with zipfile.ZipFile('protected.zip', 'r') as zipf:
     zipf.extractall(pwd=b'password123')
+    # или для конкретных файлов
+    zipf.extractall(pwd=b'password123', members=['file1.txt'])
 ```
 
-⚠️ **Важно:** `zipfile` может **читать** защищенные архивы, но **не может создавать** их. Для создания используйте библиотеку `pyminizip`.
+⚠️ **Важно:** `zipfile` может **читать** защищенные архивы, но **не создавать** их.
 
-### 14. Проверка целостности архива
+### Проверка архива
 
 ```python
-import zipfile
-
-# Проверить архив на ошибки
+# Проверить целостность
 with zipfile.ZipFile('archive.zip', 'r') as zipf:
     result = zipf.testzip()
     if result is None:
         print("✅ Архив в порядке")
     else:
-        print(f"❌ Поврежден файл: {result}")
+        print(f"❌ Поврежден: {result}")
 
-# Проверить, является ли файл ZIP-архивом
-is_valid = zipfile.is_zipfile('file.zip')
-print(f"Это ZIP? {is_valid}")
+# Проверить, является ли ZIP
+is_zip = zipfile.is_zipfile('file.zip')
 ```
 
-### 15. Настройка уровня сжатия
+### Обработка ошибок
 
 ```python
-import zipfile
-
-# Уровень сжатия от 0 (без сжатия) до 9 (максимум)
-with zipfile.ZipFile('archive.zip', 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as zipf:
-    zipf.write('large_file.txt')
-```
-
-### 16. Фильтрация файлов при распаковке
-
-```python
-import zipfile
-
-# Распаковать только .txt файлы
-with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    for filename in zipf.namelist():
-        if filename.endswith('.txt'):
-            zipf.extract(filename, 'output')
-```
-
-### 17. Использование Path из pathlib
-
-```python
-import zipfile
-from pathlib import Path
-
-# Архивирование всех .py файлов в проекте
-with zipfile.ZipFile('code.zip', 'w') as zipf:
-    base_path = Path('my_project')
-    for file_path in base_path.rglob('*.py'):
-        zipf.write(file_path, arcname=file_path.relative_to(base_path.parent))
-```
-
-### 18. Обработка ошибок
-
-```python
-import zipfile
-
 try:
     with zipfile.ZipFile('archive.zip', 'r') as zipf:
         zipf.extractall()
 except zipfile.BadZipFile:
-    print("❌ Файл поврежден или не является ZIP")
+    print("❌ Файл поврежден")
 except FileNotFoundError:
     print("❌ Архив не найден")
 except PermissionError:
     print("❌ Нет прав доступа")
-except Exception as e:
-    print(f"❌ Ошибка: {e}")
 ```
 
-## ⚠️ Важные ограничения и особенности
-
-### 1. Размер архива
-
-- **ZIP64**: По умолчанию включен, позволяет работать с файлами >4GB
-- Без ZIP64 максимальный размер архива — 2GB
-
-### 2. Защита паролем
-
-❌ **Нельзя создавать** защищенные паролем архивы через `zipfile`  
-✅ **Можно читать** защищенные архивы  
-✅ Для создания используйте `pyminizip` или `pyzipper`
-
-### 3. Кодировка имен файлов
+## 🔍 Полезные функции
 
 ```python
-# При работе с кириллицей
-with zipfile.ZipFile('archive.zip', 'w') as zipf:
-    zipf.write('файл.txt')  # Работает корректно в Python 3
-```
-
-### 4. Относительные и абсолютные пути
-
-```python
-# Плохо: сохраняет полный путь
-zipf.write('/home/user/docs/file.txt')  
-# В архиве: /home/user/docs/file.txt
-
-# Хорошо: используйте arcname
-zipf.write('/home/user/docs/file.txt', arcname='file.txt')
-# В архиве: file.txt
-```
-
-## 🎯 Лучшие практики
-
-### ✅ Рекомендуется
-
-**1. Всегда используйте контекстный менеджер `with`:**
-```python
-with zipfile.ZipFile('archive.zip', 'w') as zipf:
-    zipf.write('file.txt')
-# Автоматически закроется
-```
-
-**2. Указывайте метод сжатия:**
-```python
-with zipfile.ZipFile('archive.zip', 'w', compression=zipfile.ZIP_DEFLATED) as zipf:
-    zipf.write('file.txt')
-```
-
-**3. Используйте `arcname` для контроля структуры:**
-```python
-zipf.write('long/path/to/file.txt', arcname='file.txt')
-```
-
-**4. Обрабатывайте исключения:**
-```python
-try:
-    with zipfile.ZipFile('archive.zip', 'r') as zipf:
-        zipf.extractall()
-except zipfile.BadZipFile:
-    print("Поврежденный архив")
-```
-
-**5. Проверяйте архив перед распаковкой:**
-```python
-if zipfile.is_zipfile('file.zip'):
-    with zipfile.ZipFile('file.zip', 'r') as zipf:
-        if zipf.testzip() is None:
-            zipf.extractall()
-```
-
-### ❌ Не рекомендуется
-
-❌ Открывать архив без `with`  
-❌ Игнорировать исключения  
-❌ Распаковывать архивы без проверки (zip bomb)  
-❌ Забывать про `arcname` при архивировании  
-❌ Использовать `ZIP_STORED` для больших файлов
-
-## 🔍 Полезные функции-хелперы
-
-### Получить общий размер архива
-
-```python
-def get_zip_total_size(zip_path):
-    """Возвращает суммарный размер всех файлов в архиве"""
+# Общий размер архива
+def get_zip_size(zip_path):
     with zipfile.ZipFile(zip_path, 'r') as zipf:
-        total = sum(info.file_size for info in zipf.infolist())
-        return total
+        return sum(info.file_size for info in zipf.infolist())
 
-size = get_zip_total_size('archive.zip')
-print(f"Общий размер: {size / 1024 / 1024:.2f} MB")
-```
-
-### Извлечь только определенные файлы
-
-```python
-def extract_by_extension(zip_path, extension, output_dir):
-    """Распаковывает файлы с определенным расширением"""
+# Извлечь по расширению
+def extract_by_ext(zip_path, ext, output_dir):
     with zipfile.ZipFile(zip_path, 'r') as zipf:
-        for filename in zipf.namelist():
-            if filename.endswith(extension):
-                zipf.extract(filename, output_dir)
+        files = [f for f in zipf.namelist() if f.endswith(ext)]
+        zipf.extractall(output_dir, members=files)
 
-extract_by_extension('archive.zip', '.txt', 'output')
-```
-
-### Объединить несколько архивов
-
-```python
-def merge_zip_files(zip_files, output_zip):
-    """Объединяет несколько ZIP архивов в один"""
+# Объединить архивы
+def merge_zips(zip_files, output_zip):
     with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as output:
         for zip_file in zip_files:
             with zipfile.ZipFile(zip_file, 'r') as input_zip:
                 for filename in input_zip.namelist():
-                    data = input_zip.read(filename)
-                    output.writestr(filename, data)
-
-merge_zip_files(['archive1.zip', 'archive2.zip'], 'combined.zip')
-```
-
-### Показать дерево файлов
-
-```python
-def print_zip_tree(zip_path):
-    """Выводит структуру архива в виде дерева"""
-    with zipfile.ZipFile(zip_path, 'r') as zipf:
-        for info in zipf.infolist():
-            level = info.filename.count('/')
-            indent = "  " * level
-            name = info.filename.split('/')[-1]
-            size = f"({info.file_size} bytes)" if not info.is_dir() else ""
-            print(f"{indent}{name} {size}")
-
-print_zip_tree('archive.zip')
-```
-
-### Получить информацию о степени сжатия
-
-```python
-def get_compression_info(zip_path):
-    """Показывает статистику сжатия"""
-    with zipfile.ZipFile(zip_path, 'r') as zipf:
-        total_size = 0
-        compressed_size = 0
-        
-        for info in zipf.infolist():
-            if not info.is_dir():
-                total_size += info.file_size
-                compressed_size += info.compress_size
-        
-        ratio = 100 - (compressed_size / total_size * 100) if total_size > 0 else 0
-        
-        print(f"Оригинальный размер: {total_size / 1024:.2f} KB")
-        print(f"Сжатый размер: {compressed_size / 1024:.2f} KB")
-        print(f"Степень сжатия: {ratio:.1f}%")
-
-get_compression_info('archive.zip')
+                    output.writestr(filename, input_zip.read(filename))
 ```
 
 ## 📝 Сводная шпаргалка
@@ -465,107 +191,98 @@ get_compression_info('archive.zip')
 import zipfile
 import os
 
-# ═══ СОЗДАНИЕ АРХИВА ═══
-# Простое создание
-with zipfile.ZipFile('archive.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-    zipf.write('file.txt')
-    zipf.write('data.csv', arcname='renamed.csv')
+# СОЗДАНИЕ
+with zipfile.ZipFile('arc.zip', 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+    z.write('file.txt', arcname='renamed.txt')
+    z.writestr('gen.txt', 'content')
 
-# Архивировать папку
-def zip_folder(folder, output):
-    with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for root, dirs, files in os.walk(folder):
-            for file in files:
-                path = os.path.join(root, file)
-                zipf.write(path, os.path.relpath(path, folder))
+# РАСПАКОВКА
+with zipfile.ZipFile('arc.zip', 'r') as z:
+    z.extractall('output')  # всё
+    z.extractall('output', members=['file1.txt'])  # выборочно
+    z.extract('file.txt')  # один файл
 
-# ═══ РАСПАКОВКА ═══
-# Распаковать всё
-with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    zipf.extractall('output_folder')
+# ЧТЕНИЕ
+with zipfile.ZipFile('arc.zip', 'r') as z:
+    data = z.read('file.txt')  # bytes
+    files = z.namelist()  # список
+    info = z.getinfo('file.txt')  # детали
 
-# Распаковать один файл
-with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    zipf.extract('file.txt', 'output')
+# ДОБАВЛЕНИЕ
+with zipfile.ZipFile('arc.zip', 'a') as z:
+    z.write('new.txt')
 
-# ═══ ЧТЕНИЕ БЕЗ РАСПАКОВКИ ═══
-# Прочитать в память
-with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    content = zipf.read('file.txt')
-    text = content.decode('utf-8')
+# С ПАРОЛЕМ
+with zipfile.ZipFile('protected.zip', 'r') as z:
+    z.setpassword(b'pass')
+    z.extractall(pwd=b'pass', members=['secret.txt'])
 
-# Построчное чтение
-with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    with zipf.open('file.txt') as f:
-        for line in f:
-            print(line.decode('utf-8'))
-
-# ═══ ИНФОРМАЦИЯ ═══
-# Список файлов
-with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    files = zipf.namelist()
-    
-# Детали о файлах
-with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    for info in zipf.infolist():
-        print(info.filename, info.file_size, info.compress_size)
-
-# ═══ ПРОВЕРКА ═══
-# Проверить целостность
-with zipfile.ZipFile('archive.zip', 'r') as zipf:
-    result = zipf.testzip()  # None = OK
-
-# Проверить, является ли ZIP
-is_zip = zipfile.is_zipfile('file.zip')
-
-# ═══ ДОБАВЛЕНИЕ ═══
-# Добавить в существующий
-with zipfile.ZipFile('archive.zip', 'a') as zipf:
-    zipf.write('new_file.txt')
-
-# ═══ ЗАПИСЬ НАПРЯМУЮ ═══
-with zipfile.ZipFile('archive.zip', 'w') as zipf:
-    zipf.writestr('generated.txt', 'Content')
-
-# ═══ С ПАРОЛЕМ ═══
-with zipfile.ZipFile('protected.zip', 'r') as zipf:
-    zipf.setpassword(b'password')
-    content = zipf.read('secret.txt')
+# ПРОВЕРКА
+zipfile.is_zipfile('file.zip')
+with zipfile.ZipFile('arc.zip', 'r') as z:
+    z.testzip()  # None = OK
 ```
 
-## 🔄 Таблица методов класса ZipFile
+## 🎯 Лучшие практики
 
-| Метод | Описание | Возвращает |
-|-------|----------|-----------|
-| `.write(filename, arcname)` | Добавить файл в архив | None |
-| `.writestr(filename, data)` | Записать данные напрямую | None |
-| `.read(name)` | Прочитать файл | bytes |
-| `.open(name, mode)` | Открыть файл | file-like object |
-| `.extract(member, path)` | Извлечь один файл | str (путь) |
-| `.extractall(path, members)` | Извлечь все файлы | None |
-| `.namelist()` | Список имен файлов | list[str] |
-| `.infolist()` | Детальная информация | list[ZipInfo] |
-| `.getinfo(name)` | Информация о файле | ZipInfo |
-| `.testzip()` | Проверить целостность | str или None |
-| `.setpassword(pwd)` | Установить пароль | None |
-| `.printdir()` | Вывести содержимое | None |
+✅ **Рекомендуется:**
+- Используйте `with` для автозакрытия
+- Указывайте `compression=zipfile.ZIP_DEFLATED`
+- Используйте `arcname` для контроля путей
+- Обрабатывайте `BadZipFile` исключения
+- Проверяйте архив перед распаковкой
+- Используйте `members` для выборочной распаковки
+
+❌ **Не рекомендуется:**
+- Открывать без `with`
+- Игнорировать исключения
+- Распаковывать без проверки
+- Забывать про `arcname`
+
+## ⚠️ Важные особенности
+
+**Параметр `members`:**
+```python
+# Распаковать только нужные файлы
+members_list = ['file1.txt', 'folder/file2.txt']
+zipf.extractall('output', members=members_list)
+```
+
+**Ограничения:**
+- Максимум 4GB без ZIP64 (включен по умолчанию)
+- Нельзя создавать защищенные архивы (только читать)
+- Кортежи как ключи не поддерживаются
+
+**Кодировка:**
+```python
+# Python 3 корректно работает с кириллицей
+zipf.write('файл.txt')  # OK
+```
 
 ## 💡 Запомнить
 
-1. **ZIP** — формат архивирования и сжатия данных
-2. Модуль **zipfile** встроен в Python
-3. Всегда используйте **`with`** для автоматического закрытия
-4. **`ZIP_DEFLATED`** — стандартный метод сжатия
-5. **`arcname`** контролирует имя файла в архиве
-6. Можно читать файлы **без распаковки** всего архива
-7. **`zipfile`** читает защищенные архивы, но не создает их
-8. Всегда обрабатывайте **`BadZipFile`** исключение
-9. **`compresslevel=9`** — максимальное сжатие
-10. Используйте **`os.walk()`** для рекурсивной архивации папок
+1. `zipfile` — встроенный модуль Python
+2. Режимы: `'r'` (чтение), `'w'` (запись), `'a'` (добавление)
+3. `ZIP_DEFLATED` — стандартное сжатие
+4. `arcname` — имя файла в архиве
+5. `members` — список файлов для распаковки
+6. Можно читать без полной распаковки
+7. Паролем защитить можно только при чтении
+8. Всегда используйте `with`
 
-## 🌐 Полезные ссылки
+## 🔄 Таблица методов класса ZipFile
 
-- [Официальная документация Python](https://docs.python.org/3/library/zipfile.html)
-- [Спецификация ZIP формата](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT)
-- [PyPI: pyminizip](https://pypi.org/project/pyminizip/) — для создания защищенных архивов
-- [PyPI: pyzipper](https://pypi.org/project/pyzipper/) — альтернатива с поддержкой паролей
+|            Метод             |         Описание         |    Возвращает    |
+| :--------------------------: | :----------------------: | :--------------: |
+| `.write(filename, arcname)`  |  Добавить файл в архив   |       None       |
+| `.writestr(filename, data)`  | Записать данные напрямую |       None       |
+|        `.read(name)`         |      Прочитать файл      |      bytes       |
+|     `.open(name, mode)`      |       Открыть файл       | file-like object |
+|   `.extract(member, path)`   |    Извлечь один файл     |    str (путь)    |
+| `.extractall(path, members)` |    Извлечь все файлы     |       None       |
+|        `.namelist()`         |    Список имен файлов    |    list[str]     |
+|        `.infolist()`         |   Детальная информация   |  list[ZipInfo]   |
+|       `.getinfo(name)`       |    Информация о файле    |     ZipInfo      |
+|         `.testzip()`         |  Проверить целостность   |   str или None   |
+|     `.setpassword(pwd)`      |    Установить пароль     |       None       |
+|        `.printdir()`         |    Вывести содержимое    |       None       |
