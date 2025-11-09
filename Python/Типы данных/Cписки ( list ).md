@@ -342,3 +342,99 @@ data = ["  hello  ", "  WORLD  ", "  Python  "]
 cleaned = [s.strip().lower().capitalize() for s in data]
 # → ["Hello", "World", "Python"]
 ```
+
+
+```
+# Пример 1: Вставка в середину
+letters = ['a', 'b', 'c']
+letters[2:2] = ['d', 'e', 'f']
+print(letters)  # ['a', 'b', 'd', 'e', 'f', 'c']
+
+# Пример 2: Вставка в начало
+letters = ['a', 'b', 'c']
+letters[0:0] = ['d', 'e', 'f']
+print(letters)  # ['d', 'e', 'f', 'a', 'b', 'c']
+
+# Пример 3: Ошибка с append
+numbers = [1, 2, 3, 4]
+numbers = numbers.append(5)  # ⚠️ ОШИБКА!
+print(numbers)  # None
+
+# Пример 4: Правильное использование append
+numbers = [1, 2, 3, 4]
+numbers.append(5)
+print(numbers)  # [1, 2, 3, 4, 5]
+
+# Пример 5: Замена элемента на список
+letters = ['a', 'b', 'c', 'd']
+letters[3] = ['d', 'e', 'f', 'g']
+print(letters)  # ['a', 'b', 'c', ['d', 'e', 'f', 'g']]
+
+# Пример 6: Вложенные списки
+letters = ['a', 'b', 'c']
+numbers = [1, 2, 3]
+combine = [letters, numbers]
+print(combine[1])  # [1, 2, 3]
+
+# Пример 7: Удаление через срез
+letters = ['a', 'b', 'c', 'd']
+letters[1:3] = []
+print(letters)  # ['a', 'd']
+
+# Пример 8: Замена одного элемента на несколько
+letters = ['a', 'b', 'c']
+letters[1:2] = ['x', 'y', 'z']
+print(letters)  # ['a', 'x', 'y', 'z', 'c']
+
+# Пример 9: Очистка списка
+letters = ['a', 'b', 'c']
+letters[:] = []
+print(letters)  # []
+
+# Пример 10: Удвоение списка
+letters = ['a', 'b', 'c']
+letters *= 2
+print(letters)  # ['a', 'b', 'c', 'a', 'b', 'c']
+
+# Пример 11: Склейка списков (новый список)
+letters = ['a', 'b']
+numbers = [1, 2]
+result = letters + numbers
+print(result)  # ['a', 'b', 1, 2]
+
+# Пример 12: Добавление списка на месте (extend)
+letters = ['a', 'b']
+numbers = [1, 2]
+letters.extend(numbers)
+print(letters)  # ['a', 'b', 1, 2]
+
+# Пример 13: Добавление через + (создаётся новый список)
+letters = ['a', 'b']
+letters = letters + ['c']
+print(letters)  # ['a', 'b', 'c']
+
+# Пример 14: Добавление через += (изменяется тот же список)
+letters = ['a', 'b']
+letters += ['c']
+print(letters)  # ['a', 'b', 'c']
+
+# Пример 15: Повтор элементов
+numbers = [1, 2]
+result = numbers * 3
+print(result)  # [1, 2, 1, 2, 1, 2]
+
+# Пример 16: Замена последнего элемента
+letters = ['a', 'b', 'c']
+letters[-1:] = ['x', 'y']
+print(letters)  # ['a', 'b', 'x', 'y']
+
+# Пример 17: Вставка в конец через срез
+letters = ['a', 'b', 'c']
+letters[3:3] = ['d', 'e']
+print(letters)  # ['a', 'b', 'c', 'd', 'e']
+
+# Пример 18: Замена нескольких элементов на один
+letters = ['a', 'b', 'c', 'd']
+letters[1:3] = ['x']
+print(letters)  # ['a', 'x', 'd']
+```
