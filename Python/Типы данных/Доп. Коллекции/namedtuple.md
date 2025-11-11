@@ -1,3 +1,21 @@
+## Пример для быстрой справки
+
+```python
+from collections import namedtuple
+
+# Создаем класс Point с полями x и y
+Point = namedtuple('Point', ['x', 'y'])
+
+# Создаем экземпляр
+p = Point(3, 7)
+
+print(p)           # Point(x=3, y=7)
+print(p.x, p.y)    # 3 7
+print(p[0], p[1])  # 3 7
+```
+
+Все примеры в таблице ниже основаны на этом коде ⬇️
+
 ## Быстрая справка
 
 |Операция|Синтаксис|Описание|
@@ -12,6 +30,8 @@
 |**Изменение полей**|`p2 = p._replace(x=10)`|Создает новый экземпляр|
 |**Преобразование в dict**|`p._asdict()`|Возвращает OrderedDict|
 |**Список полей**|`Point._fields`|Кортеж с именами полей|
+|**Defaults полей**|`Point._field_defaults`|Словарь со значениями по умолчанию|
+|**Создание из списка**|`Point._make([3, 7])`|Создание из итерируемого объекта|
 |**Значения по умолчанию**|`namedtuple('Point', ['x', 'y'], defaults=(0, 0))`|Python 3.7+|
 
 ## Что такое namedtuple?
@@ -111,6 +131,287 @@ p2 = Person(name='Мария', age=30, city='Санкт-Петербург')
 p3 = Person('Петр', age=28, city='Казань')
 
 print(p1)  # Person(name='Иван', age=25, city='Москва')
+```
+
+## Встроенные методы и атрибуты
+
+### Метод `_replace()` — изменение полей
+
+Создает **новый** экземпляр с измененными значениями (исходный остается неизменным):
+
+```python
+from collections import namedtuple
+
+Person = namedtuple('Person', ['name', 'age', 'city'])
+person = Person('Иван', 25, 'Москва')
+
+# Создаем новый экземпляр с измененным возрастом
+person_older = person._replace(age=26)
+
+print(person)        # Person(name='Иван', age=25, city='Москва')
+print(person_older)  # Person(name='Иван', age=26, city='Москва')
+
+# Можно изменить несколько полей
+person_new = person._replace(age=30, city='Санкт-Петербург')
+print(person_new)    # Person(name='Иван', age=30, city='Санкт-Петербург')
+```
+
+**Практическое применение — инкремент значения:**
+
+```python
+Pet = namedtuple('Pet', ['type', 'name', 'age'])
+frank = Pet(type='pigeon', name='Френк', age=3)
+
+# Френк стареет
+frank = frank._replace(age=frank.age + 1)
+print(frank)  # Pet(type='pigeon', name='Френк', age=4)
+```
+
+### Метод `_asdict()` — преобразование в словарь
+
+Возвращает `OrderedDict` (до Python 3.8) или обычный `dict` (Python 3.8+):
+
+```python
+from collections import namedtuple
+
+Person = namedtuple('Person', ['name', 'age', 'city'])
+person = Person('Мария', 30, 'Казань')
+
+# Преобразование в словарь
+person_dict = person._asdict()
+print(person_dict)
+# OrderedDict([('name', 'Мария'), ('age', 30), ('city', 'Казань')])
+
+# Теперь можно изменять
+person_dict['age'] = 31
+print(person_dict)
+# OrderedDict([('name', 'Мария'), ('age', 31), ('city', 'Казань')])
+```
+
+**Практическое применение — сериализация в JSON:**
+
+```python
+import json
+from collections import namedtuple
+
+Person = namedtuple('Person', ['name', 'age', 'city'])
+person = Person('Алексей', 28, 'Новосибирск')
+
+# Преобразование в JSON
+json_data = json.dumps(person._asdict())
+print(json_data)  # {"name": "Алексей", "age": 28, "city": "Новосибирск"}
+```
+
+### Атрибут `_fields` — список полей
+
+Возвращает кортеж с именами всех полей:
+
+```python
+from collections import namedtuple
+
+Point = namedtuple('Point', ['x', 'y', 'z'])
+
+print(Point._fields)  # ('x', 'y', 'z')
+print(type(Point._fields))  # <class 'tuple'>
+
+# Проверка наличия поля
+if 'x' in Point._fields:
+    print("Поле x существует")
+
+# Итерация по полям
+for field in Point._fields:
+    print(field)  # x, y, z
+```
+
+**Практическое применение — динамическое создание:**
+
+```python
+from collections import namedtuple
+
+# Создание одного типа на основе другого
+Point2D = namedtuple('Point2D', ['x', 'y'])
+Point3D = namedtuple('Point3D', Point2D._fields + ('z',))
+
+print(Point3D._fields)  # ('x', 'y', 'z')
+```
+
+**Итерация по полям и значениям:**
+
+```python
+from collections import namedtuple
+
+Person = namedtuple('Person', ['name', 'age', 'height'])
+timur = Person('Тимур', 29, 170)
+
+# Используем zip для итерации
+for field, value in zip(Person._fields, timur):
+    print(f'{field} -> {value}')
+
+# Вывод:
+# name -> Тимур
+# age -> 29
+# height -> 170
+```
+
+### Атрибут `_field_defaults` — значения по умолчанию
+
+Словарь, который показывает, какие поля имеют значения по умолчанию:
+
+```python
+from collections import namedtuple
+
+# С значениями по умолчанию
+Person = namedtuple('Person', ['name', 'age', 'country'], defaults=['Russia'])
+
+print(Person._field_defaults)  # {'country': 'Russia'}
+
+timur = Person('Тимур', 29)  # country будет 'Russia'
+print(timur)  # Person(name='Тимур', age=29, country='Russia')
+
+# Без значений по умолчанию
+Point = namedtuple('Point', ['x', 'y'])
+print(Point._field_defaults)  # {}
+```
+
+**Практическое применение — проверка обязательных полей:**
+
+```python
+from collections import namedtuple
+
+Config = namedtuple('Config', ['host', 'port', 'debug', 'timeout'], 
+                    defaults=(False, 30))
+
+print(Config._field_defaults)  # {'debug': False, 'timeout': 30}
+
+# Определяем, какие поля обязательные
+required_fields = [f for f in Config._fields if f not in Config._field_defaults]
+print(f"Обязательные поля: {required_fields}")  # ['host', 'port']
+
+optional_fields = list(Config._field_defaults.keys())
+print(f"Необязательные поля: {optional_fields}")  # ['debug', 'timeout']
+```
+
+### Метод `_make()` — создание из итерируемого объекта
+
+Создает экземпляр из списка, кортежа или другой итерируемой последовательности:
+
+```python
+from collections import namedtuple
+
+Point = namedtuple('Point', ['x', 'y'])
+
+# Обычное создание
+p1 = Point(3, 7)
+
+# Создание из списка
+data = [10, 20]
+p2 = Point._make(data)
+print(p2)  # Point(x=10, y=20)
+
+# Создание из кортежа
+p3 = Point._make((5, 15))
+print(p3)  # Point(x=5, y=15)
+```
+
+**Практическое применение — чтение из CSV:**
+
+```python
+import csv
+from collections import namedtuple
+
+Employee = namedtuple('Employee', ['name', 'age', 'salary'])
+
+with open('employees.csv', 'r') as file:
+    reader = csv.reader(file)
+    next(reader)  # Пропускаем заголовок
+    
+    employees = [Employee._make(row) for row in reader]
+    
+for emp in employees:
+    print(f"{emp.name}: {emp.salary}")
+```
+
+### Все специальные методы и атрибуты
+
+```python
+from collections import namedtuple
+
+Point = namedtuple('Point', ['x', 'y'], defaults=(0,))
+point = Point(3, 7)
+
+# Атрибуты
+Point._fields          # ('x', 'y') - кортеж имен полей
+Point._field_defaults  # {'y': 0} - словарь со значениями по умолчанию
+
+# Методы
+point._asdict()        # dict - преобразование в словарь
+point._replace(x=10)   # Point(x=10, y=7) - создание с измененными полями
+Point._make([5, 15])   # Point(x=5, y=15) - создание из итерируемого объекта
+```
+
+## Приемы и паттерны
+
+### Прототип для значений по умолчанию (Python < 3.7)
+
+Если `defaults` недоступен, используйте прототип:
+
+```python
+from collections import namedtuple
+
+Pet = namedtuple('Pet', ['type', 'name', 'alt_name'])
+
+# Создаем прототип с дефолтными значениями
+default_pet = Pet(type=None, name=None, alt_name='нет')
+
+# Используем _replace для создания новых экземпляров
+frank = default_pet._replace(type='pigeon', name='Френк')
+print(frank)  # Pet(type='pigeon', name='Френк', alt_name='нет')
+
+claire = default_pet._replace(type='fox', name='Клер')
+print(claire)  # Pet(type='fox', name='Клер', alt_name='нет')
+```
+
+### Обновление нескольких экземпляров
+
+```python
+from collections import namedtuple
+
+Product = namedtuple('Product', ['name', 'price', 'quantity'])
+
+products = [
+    Product('Яблоко', 50, 100),
+    Product('Банан', 60, 80),
+    Product('Апельсин', 70, 120)
+]
+
+# Повышаем все цены на 10%
+updated_products = [p._replace(price=int(p.price * 1.1)) for p in products]
+
+for p in updated_products:
+    print(f"{p.name}: {p.price}")
+# Яблоко: 55
+# Банан: 66
+# Апельсин: 77
+```
+
+### Копирование с частичными изменениями
+
+```python
+from collections import namedtuple
+
+Config = namedtuple('Config', ['host', 'port', 'debug', 'timeout'])
+
+# Базовая конфигурация
+base_config = Config('localhost', 8080, False, 30)
+
+# Конфигурация для разработки
+dev_config = base_config._replace(debug=True, timeout=60)
+
+# Конфигурация для продакшена
+prod_config = base_config._replace(host='prod.example.com', port=443)
+
+print(dev_config)   # Config(host='localhost', port=8080, debug=True, timeout=60)
+print(prod_config)  # Config(host='prod.example.com', port=443, debug=False, timeout=30)
 ```
 
 ## Доступ к данным
