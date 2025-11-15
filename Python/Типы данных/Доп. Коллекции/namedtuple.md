@@ -1,6 +1,4 @@
-# Памятка по namedtuple в Python
 
-## Пример для быстрой справки
 
 ```python
 from collections import namedtuple
