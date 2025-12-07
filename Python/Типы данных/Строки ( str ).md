@@ -13,19 +13,19 @@
 
 ## 🚀 Быстрая справка
 
-|Задача|Метод|Пример|
-|---|---|---|
-|Найти подстроку|`.find()`|`text.find("abc")`|
-|Заменить текст|`.replace()`|`text.replace("old", "new")`|
-|Разделить строку|`.split()`|`text.split(",")`|
-|Объединить список|`.join()`|`",".join(list)`|
-|Убрать пробелы|`.strip()`|`text.strip()`|
-|В верхний регистр|`.upper()`|`text.upper()`|
-|В нижний регистр|`.lower()`|`text.lower()`|
-|Проверить начало|`.startswith()`|`text.startswith("abc")`|
-|Проверить конец|`.endswith()`|`text.endswith("xyz")`|
-|Количество вхождений|`.count()`|`text.count("abc")`|
-|Проверить содержимое|`.isdigit()`, `.isalpha()`|`text.isdigit()`|
+| Задача               | Метод                      | Пример                       |
+| -------------------- | -------------------------- | ---------------------------- |
+| Найти подстроку      | `.find()`                  | `text.find("abc")`           |
+| Заменить текст       | `.replace()`               | `text.replace("old", "new")` |
+| Разделить строку     | `.split()`                 | `text.split(",")`            |
+| Объединить список    | `.join()`                  | `",".join(list)`             |
+| Убрать пробелы       | `.strip()`                 | `text.strip()`               |
+| В верхний регистр    | `.upper()`                 | `text.upper()`               |
+| В нижний регистр     | `.lower()`                 | `text.lower()`               |
+| Проверить начало     | `.startswith()`            | `text.startswith("abc")`     |
+| Проверить конец      | `.endswith()`              | `text.endswith("xyz")`       |
+| Количество вхождений | `.count()`                 | `text.count("abc")`          |
+| Проверить содержимое | `.isdigit()`, `.isalpha()` | `text.isdigit()`             |
 
 ## 📝 Создание строк
 
