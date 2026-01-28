@@ -378,54 +378,11 @@ match.endpos             # 23
 ---
 
 ## 🚩 Флаги
-
-# 🚩 Флаги регулярных выражений в Python
-
-|Полное имя|Сокращённое|Встроенное имя|Назначение|
-|---|---|---|---|
-|`re.IGNORECASE`|`re.I`|`(?i)`|Игнорирует регистр символов|
-|`re.findall(r'python', 'Python PYTHON', re.I)`|`re.findall(r'python', 'Python PYTHON', re.I)`|`re.findall(r'(?i)python', 'Python PYTHON')`|`['Python', 'PYTHON']`|
-|||||
-|`re.MULTILINE`|`re.M`|`(?m)`|Меняет поведение `^` и `$`: они начинают работать для каждой строки|
-|`re.findall(r'^test', 'test\ntest', re.M)`|`re.findall(r'^test', 'test\ntest', re.M)`|`re.findall(r'(?m)^test', 'test\ntest')`|`['test', 'test']`|
-|||||
-|`re.DOTALL`|`re.S`|`(?s)`|Заставляет метасимвол `.` совпадать с любым символом, включая `\n`|
-|`re.findall(r'a.b', 'a\nb', re.S)`|`re.findall(r'a.b', 'a\nb', re.S)`|`re.findall(r'(?s)a.b', 'a\nb')`|`['a\nb']`|
-|||||
-|`re.VERBOSE`|`re.X`|`(?x)`|Разрешает комментарии и переносы строк в регулярном выражении|
-|`re.compile(r'(?x)\d+ \s+ \w+')`|`re.compile(r'(?x)\d+ \s+ \w+')`|`re.compile(r'(?x)\d+ # цифры')`|Для читаемости regex|
-|||||
-|`re.ASCII`|`re.A`|`(?a)`|Ограничивает `\w`, `\d`, `\s` символами ASCII|
-|`re.findall(r'\w+', 'abc_АБВ', re.A)`|`re.findall(r'\w+', 'abc_АБВ', re.A)`|`re.findall(r'(?a)\w+', 'abc_АБВ')`|`['abc_']`|
-|||||
-|`re.UNICODE`|`re.U`|`(?u)`|Использует Unicode-поведение для `\w`, `\d`, `\s` (по умолчанию в Python 3)|
-|`re.findall(r'\w+', 'abc_АБВ', re.U)`|`re.findall(r'\w+', 'abc_АБВ', re.U)`|`re.findall(r'(?u)\w+', 'abc_АБВ')`|`['abc_АБВ']`|
-|||||
-|`re.LOCALE`|`re.L`|`(?L)`|Учитывает региональные (locale) настройки при работе метасимволов|
-|`re.findall(r'\w+', text, re.L)`|`re.findall(r'\w+', text, re.L)`|`re.findall(r'(?L)\w+', text)`|Зависит от locale|
-|||||
-|`re.DEBUG`|—|—|Выводит отладочную информацию о разборе регулярного выражения|
-|`re.compile(r'\d+', re.DEBUG)`|—|—|Выводит дерево разбора|
-|||||
-|`re.NOFLAG`|—|—|Явно указывает, что флаги не применяются|
-|`re.findall(r'test', 'Test', re.NOFLAG)`|—|—|`[]` (регистр учитывается)|
-
----
-
-## 🔗 Комбинирование флагов
+## Общий формат использования:
 
 ```python
-# Через побитовое ИЛИ (|)
-re.findall(r'python', 'Python\nPYTHON', re.I | re.M)
-# → ['Python', 'PYTHON']
-
-# Через встроенные флаги
-re.findall(r'(?im)python', 'Python\nPYTHON')
-# → ['Python', 'PYTHON']
-
-# Несколько встроенных флагов
-re.findall(r'(?ims)a.b', 'A\nB text')
-# → ['A\nB']
+re.findall(pattern, text, flags)     # Через параметр flags
+re.findall(r'(?флаг)pattern', text)  # Встроенный в паттерн
 ```
 
 | Полное имя      | Сокращённо | Встроенное имя | Назначение                                                                                                   |
