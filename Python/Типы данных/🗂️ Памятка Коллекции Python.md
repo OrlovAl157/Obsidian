@@ -2,6 +2,7 @@
 tags:
   - python
   - коллекции
+  - bigO
 ---
 
 #python #коллекции
