@@ -7,6 +7,7 @@ tags:
   - "#Immutable"
 Не изменяемый: true
 Хешируемый: true
+dict_key: true
 ---
 
 # 🔢 Целые числа (int)

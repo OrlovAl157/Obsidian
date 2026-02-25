@@ -4,6 +4,11 @@ tags:
   - тема/типы_данных
   - тема/строки
   - статус/завершён
+  - Immutable
+Не изменяемый: true
+hashable: true
+iterable: true
+dict_key: true
 ---
 
 # 📝 Строки (str)
