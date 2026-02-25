@@ -1,4 +1,4 @@
-
+## Пример для быстрой справки
 
 ```python
 from collections import namedtuple
