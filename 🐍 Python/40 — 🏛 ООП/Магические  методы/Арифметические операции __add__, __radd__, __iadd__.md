@@ -19,6 +19,8 @@ tags:
 
 ### Основные арифметические методы
 
+Многие встроенные типы поддерживают арифметику через операторы `+`, `-`, `*`, `/`, `//`, `%`. Чтобы добавить такую же поддержку в свой класс — определяем соответствующие магические методы:
+
 | Метод | Оператор | Описание |
 |---|---|---|
 | `__add__(self, other)` | `a + b` | Сложение |
@@ -28,8 +30,38 @@ tags:
 | `__floordiv__(self, other)` | `a // b` | Целочисленное деление |
 | `__mod__(self, other)` | `a % b` | Остаток от деления |
 | `__pow__(self, other)` | `a ** b` | Возведение в степень |
+| `__divmod__(self, other)` | `divmod(a, b)` | Частное и остаток |
 
-Выражение `a + b` равносильно вызову `a.__add__(b)`:
+Выражение `a + b` равносильно вызову `a.__add__(b)`.
+
+#### Базовый пример
+
+```python
+class PiggyBank:
+    def __init__(self, coins):
+        self.coins = coins
+
+    def __repr__(self):
+        return f'PiggyBank({self.coins})'
+
+    def __add__(self, other):
+        return PiggyBank(self.coins + other)   # создаём и возвращаем НОВЫЙ объект
+
+
+bank1 = PiggyBank(10)
+bank2 = bank1 + 5    # → вызов bank1.__add__(5)
+bank3 = bank1 + 15
+
+print(bank1)   # → PiggyBank(10)  — исходный не изменился!
+print(bank2)   # → PiggyBank(15)
+print(bank3)   # → PiggyBank(25)
+```
+
+> ⚠️ Арифметические методы всегда возвращают **новый объект**, а не изменяют исходный. Для изменения на месте используют `__iadd__` и др. (см. ниже).
+
+#### Поддержка нескольких типов
+
+Можно гибко определить поведение для разных типов `other`:
 
 ```python
 class PiggyBank:
@@ -41,37 +73,51 @@ class PiggyBank:
 
     def __add__(self, other):
         if isinstance(other, int):
-            return PiggyBank(self.coins + other)        # новый объект + int
+            return PiggyBank(self.coins + other)         # PiggyBank + int
         elif isinstance(other, PiggyBank):
-            return PiggyBank(self.coins + other.coins)  # новый объект + PiggyBank
-        return NotImplemented
+            return PiggyBank(self.coins + other.coins)   # PiggyBank + PiggyBank
+        return NotImplemented                            # неизвестный тип
 
 
 bank1 = PiggyBank(10)
-bank2 = bank1 + 5       # → PiggyBank(15)
-bank3 = bank1 + bank2   # → PiggyBank(25)
+bank2 = bank1 + 5         # → PiggyBank(15)
+bank3 = bank1 + bank2     # → PiggyBank(25)
 ```
 
-> ⚠️ Арифметические методы всегда возвращают **новый объект**, а не изменяют исходный. Для изменения на месте используют `__iadd__` и др.
-
-> 💡 После реализации `__add__()` можно использовать встроенную функцию `sum()` для суммирования экземпляров класса.
+> 💡 После реализации `__add__()` можно использовать встроенную функцию `sum()` для суммирования экземпляров класса:
+> ```python
+> banks = [PiggyBank(10), PiggyBank(20), PiggyBank(30)]
+> print(sum(banks))   # → PiggyBank(60)
+> ```
 
 ---
 
-### Отражённые методы (reflected) — префикс `r`
+### Отражённые методы — префикс `r` (reflected)
 
-Проблема: `bank + 5` работает, но `5 + bank` падает с `TypeError` — потому что `int.__add__(bank)` не знает что делать с `PiggyBank` и возвращает `NotImplemented`, а дальше Python не знает куда идти.
+#### Проблема порядка операндов
 
-Решение — отражённые методы:
+При выполнении `a + b` Python вызывает `a.__add__(b)`. Это значит, что порядок операндов важен:
+
+```python
+bank = PiggyBank(10)
+
+print(bank + 5)   # ✅ → bank.__add__(5) → PiggyBank(15)
+print(5 + bank)   # ❌ → (5).__add__(bank) → int не знает про PiggyBank → TypeError
+```
+
+#### Решение — отражённые методы
+
+Отражённые методы вызываются у **правого** операнда, когда левый вернул `NotImplemented`:
 
 | Метод | Когда вызывается |
 |---|---|
-| `__radd__(self, other)` | `other + self`, если `other.__add__(self)` вернул `NotImplemented` |
+| `__radd__(self, other)` | `other + self` |
 | `__rsub__(self, other)` | `other - self` |
 | `__rmul__(self, other)` | `other * self` |
 | `__rtruediv__(self, other)` | `other / self` |
 | `__rfloordiv__(self, other)` | `other // self` |
 | `__rmod__(self, other)` | `other % self` |
+| `__rpow__(self, other)` | `other ** self` |
 
 #### Алгоритм выполнения `a + b`
 
@@ -81,24 +127,34 @@ a + b
   ▼
 a.__add__(b)
   │
-  ├── True / False  ──────────────────► результат
+  ├── True / False / результат  ──────────────► готово
   │
   └── NotImplemented
         │
         ▼
    тип(a) == тип(b)?
         │
-        ├── ДА ──► TypeError сразу
-        │          (бессмысленно спрашивать b, он такой же)
+        ├── ДА ──────────────────────────────► TypeError сразу
+        │          (бессмысленно спрашивать b, он такой же тип)
         │
-        └── НЕТ ──► b.__radd__(a)
-                      │
-                      ├── True / False  ──► результат
-                      │
-                      └── NotImplemented ──► TypeError
+        └── НЕТ
+              │
+              ▼
+         b.__radd__(a)
+              │
+              ├── True / False / результат  ──► готово
+              │
+              └── NotImplemented ────────────► TypeError
 ```
 
-> ⚠️ Этот механизм работает **только через оператор `+`**. При прямом вызове `a.__add__(b)` никакого fallback нет — сразу получаем `NotImplemented`.
+> ⚠️ Этот механизм работает **только через оператор `+`**. При прямом вызове `a.__add__(b)` никакого fallback нет — сразу получаем `NotImplemented`:
+> ```python
+> num = 5
+> print(num.__add__(bank))   # → NotImplemented  (прямой вызов, без fallback)
+> print(5 + bank)            # → PiggyBank(15)   (через оператор — fallback работает)
+> ```
+
+#### Реализация `__radd__`
 
 ```python
 class PiggyBank:
@@ -114,23 +170,26 @@ class PiggyBank:
         return NotImplemented
 
     def __radd__(self, other):
-        return self.__add__(other)   # делегируем в __add__
+        return self.__add__(other)   # делегируем в __add__, т.к. сложение коммутативно
 
 
 bank = PiggyBank(10)
 
-print(bank + 5)   # → PiggyBank(15)  — вызов bank.__add__(5)
-print(5 + bank)   # → PiggyBank(15)  — вызов bank.__radd__(5)
-
-# Прямой вызов — без fallback:
-print((5).__add__(bank))   # → NotImplemented
+print(bank + 5)   # → PiggyBank(15)  — вызов __add__
+print(5 + bank)   # → PiggyBank(15)  — вызов __radd__ → делегирует в __add__
 ```
 
-> 💡 В `__radd__` обычно просто делегируют в `__add__`, если операция коммутативная (сложение, умножение). Для некоммутативных (вычитание, деление) нужно менять порядок: `return PiggyBank(other - self.coins)`.
+> 💡 Для **коммутативных** операций (сложение, умножение) `__radd__` обычно просто делегирует в `__add__`. Для **некоммутативных** (вычитание, деление) порядок важен — нужно явно поменять местами:
+> ```python
+> def __rsub__(self, other):
+>     return PiggyBank(other - self.coins)   # other - self, не self - other!
+> ```
 
 ---
 
 ### Методы составного присваивания — префикс `i` (inplace)
+
+Операторы `+=`, `-=`, `*=` и т.д. отличаются от обычных арифметических тем, что для **изменяемых** объектов они меняют объект **на месте**, не создавая новый.
 
 | Метод | Оператор | Описание |
 |---|---|---|
@@ -142,7 +201,11 @@ print((5).__add__(bank))   # → NotImplemented
 | `__imod__(self, other)` | `a %= b` | Остаток на месте |
 | `__ipow__(self, other)` | `a **= b` | Степень на месте |
 
-Ключевое отличие от `__add__`: метод **изменяет `self`** и возвращает `self`, а не новый объект:
+> 💡 Префикс `i` — сокращение от **inplace** (на месте).
+
+#### Ключевое отличие от `__add__`
+
+`__iadd__` изменяет `self` и возвращает `self` (тот же объект), а не новый:
 
 ```python
 class PiggyBank:
@@ -153,54 +216,91 @@ class PiggyBank:
         return f'PiggyBank({self.coins})'
 
     def __add__(self, other):
-        return PiggyBank(self.coins + other)   # новый объект
+        return PiggyBank(self.coins + other)   # НОВЫЙ объект
 
     def __iadd__(self, other):
         self.coins += other
-        return self                            # тот же объект!
+        return self                            # ТОТ ЖЕ объект!
 
 
 bank = PiggyBank(10)
-print(id(bank))   # → 140234...
+print(id(bank))    # → 140234...
 
-bank += 10        # изменяет bank на месте
-print(id(bank))   # → 140234...  (id тот же!)
-print(bank)       # → PiggyBank(20)
+bank += 10
+bank += 5
+
+print(id(bank))    # → 140234...  (id не изменился!)
+print(bank)        # → PiggyBank(25)
 ```
 
-#### `__add__` vs `__iadd__` — разница в id
+#### `__add__` vs `__iadd__` — сравнение по `id`
 
 ```python
+# Только __add__ (без __iadd__):
 bank = PiggyBank(10)
-
-# С __add__ (без __iadd__):
-bank += 5    # Python вызывает __add__ → создаёт новый объект → bank = новый объект
-             # id меняется!
+print(id(bank))   # → 111111
+bank += 5         # Python вызывает __add__ → создаёт новый объект → bank = новый объект
+print(id(bank))   # → 222222  ← id изменился, это другой объект!
 
 # С __iadd__:
-bank += 5    # Python вызывает __iadd__ → изменяет существующий → return self
-             # id не меняется!
+bank = PiggyBank(10)
+print(id(bank))   # → 111111
+bank += 5         # Python вызывает __iadd__ → изменяет существующий → return self
+print(id(bank))   # → 111111  ← id тот же, объект не менялся
 ```
 
-> 💡 Если `__iadd__` не определён, но определён `__add__` — оператор `+=` делегируется в `__add__`. Работает, но всегда создаёт новый объект.
+> 💡 Если `__iadd__` не определён, но определён `__add__` — оператор `+=` **автоматически делегируется** в `__add__`. Работает, но всегда создаёт новый объект.
 
-> ⚠️ Для **неизменяемых** объектов `__iadd__` не имеет смысла — они по определению не могут меняться. `+=` у них всегда создаёт новый объект (как у `int`, `str`, `tuple`).
+> ⚠️ Для **неизменяемых** объектов `__iadd__` не имеет смысла — `+=` у них всегда создаёт новый объект, как у `int`, `str`, `tuple`.
+
+#### Разница между `list + list` и `list += list`
+
+```python
+# Обычное сложение — новый объект:
+nums = [1, 2, 3]
+print(id(nums))         # → 111111
+nums = nums + [4, 5]
+print(id(nums))         # → 222222  ← новый объект
+
+# Составное присваивание — тот же объект:
+nums = [1, 2, 3]
+print(id(nums))         # → 111111
+nums += [4, 5]
+print(id(nums))         # → 111111  ← тот же объект (list изменяемый)
+```
 
 ---
 
 ## 📝 Примечания
 
-### Битовые операции тоже имеют свои методы
+### Битовые операции тоже имеют магические методы
 
 ```python
-__lshift__()   # <<     двоичный сдвиг влево
-__rshift__()   # >>     двоичный сдвиг вправо
-__and__()      # &      двоичное И
-__or__()       # |      двоичное ИЛИ
-__xor__()      # ^      двоичное XOR
+__lshift__(self, other)    # <<    двоичный сдвиг влево
+__rshift__(self, other)    # >>    двоичный сдвиг вправо
+__and__(self, other)       # &     двоичное И
+__or__(self, other)        # |     двоичное ИЛИ
+__xor__(self, other)       # ^     двоичное XOR
 ```
 
-Все они также имеют отражённые (`__rlshift__` и др.) и inplace (`__ilshift__` и др.) версии.
+Все они также имеют отражённые (`__rlshift__` и др.) и inplace-версии (`__ilshift__` и др.).
+
+### Полная таблица операторов составного присваивания
+
+| Оператор | Метод |
+|---|---|
+| `+=` | `__iadd__()` |
+| `-=` | `__isub__()` |
+| `*=` | `__imul__()` |
+| `/=` | `__itruediv__()` |
+| `//=` | `__ifloordiv__()` |
+| `%=` | `__imod__()` |
+| `**=` | `__ipow__()` |
+| `<<=` | `__ilshift__()` |
+| `>>=` | `__irshift__()` |
+| `&=` | `__iand__()` |
+| `^=` | `__ixor__()` |
+| `\|=` | `__ior__()` |
 
 ---
 
@@ -214,7 +314,7 @@ class PiggyBank:
     def __repr__(self):
         return f'PiggyBank({self.coins})'
 
-    # Основной — создаёт новый объект
+    # Основной — создаёт НОВЫЙ объект
     def __add__(self, other):
         if isinstance(other, int):
             return PiggyBank(self.coins + other)
@@ -224,9 +324,9 @@ class PiggyBank:
 
     # Отражённый — для случая: 5 + bank
     def __radd__(self, other):
-        return self.__add__(other)
+        return self.__add__(other)   # делегируем, т.к. сложение коммутативно
 
-    # Inplace — изменяет на месте
+    # Inplace — изменяет ТОТ ЖЕ объект
     def __iadd__(self, other):
         if isinstance(other, int):
             self.coins += other
@@ -240,14 +340,15 @@ class PiggyBank:
 bank1 = PiggyBank(10)
 bank2 = PiggyBank(5)
 
-print(bank1 + 3)      # → PiggyBank(13)  — __add__
-print(3 + bank1)      # → PiggyBank(13)  — __radd__
-print(bank1 + bank2)  # → PiggyBank(15)  — __add__
+print(bank1 + 3)      # → PiggyBank(13)  — __add__, новый объект
+print(3 + bank1)      # → PiggyBank(13)  — __radd__ → __add__, новый объект
+print(bank1 + bank2)  # → PiggyBank(15)  — __add__, новый объект
 
 bank1 += 10           # → __iadd__, bank1 тот же объект
 print(bank1)          # → PiggyBank(20)
 
-print(sum([PiggyBank(10), PiggyBank(20), PiggyBank(30)]))  # → PiggyBank(60)
+# sum() работает благодаря __add__ и __radd__:
+print(sum([PiggyBank(10), PiggyBank(20), PiggyBank(30)]))   # → PiggyBank(60)
 ```
 
 ---
