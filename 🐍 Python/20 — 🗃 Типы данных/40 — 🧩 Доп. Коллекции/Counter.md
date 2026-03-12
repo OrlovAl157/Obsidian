@@ -2,7 +2,15 @@
 tags:
   - python
   - тема/типы_данных
-  - коллекции
+  - тема/коллекции
+  - тема/collections
+  - статус/завершён
+уровень: средний
+изменяемый: true
+хешируемый: false
+dict_key: false
+итерируемый: true
+стандартная_библиотека: true
 ---
 
 ## Пример для быстрой справки
@@ -858,3 +866,9 @@ print(c)  # Counter({'b': 10, 'a': 8})
 - [Официальная документация Counter](https://docs.python.org/3/library/collections.html#collections.Counter)
 - [PEP 3102 — Keyword-Only Arguments](https://www.python.org/dev/peps/pep-3102/)
 - [Исходный код Counter](https://github.com/python/cpython/blob/main/Lib/collections/__init__.py)
+
+## 🔗 Связанные темы
+
+- [[04 — 📖 Словарь ( dict ) 🔹]]
+- [[01 — 📋 Cписки ( list ) 🔹]]
+- [[defaultdict]]

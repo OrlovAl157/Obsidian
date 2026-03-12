@@ -2,8 +2,13 @@
 tags:
   - python
   - тема/типы_данных
-  - коллекции
-  - статус/готово
+  - тема/коллекции
+  - тема/collections
+  - статус/завершён
+уровень: средний
+изменяемый: true
+итерируемый: true
+стандартная_библиотека: true
 ---
 
 ## Пример для быстрой справки
@@ -977,3 +982,8 @@ print(f"ChainMap size: {sys.getsizeof(chain)} bytes")
 - [Официальная документация ChainMap (EN)](https://docs.python.org/3/library/collections.html#collections.ChainMap)
 - [PEP 3132 — Extended Iterable Unpacking](https://www.python.org/dev/peps/pep-3132/)
 - [Исходный код ChainMap](https://github.com/python/cpython/blob/main/Lib/collections/__init__.py)
+
+## 🔗 Связанные темы
+
+- [[04 — 📖 Словарь ( dict ) 🔹]]
+- [[defaultdict]]

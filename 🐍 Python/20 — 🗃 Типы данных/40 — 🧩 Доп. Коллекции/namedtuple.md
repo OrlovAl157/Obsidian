@@ -1,3 +1,18 @@
+---
+tags:
+  - python
+  - тема/типы_данных
+  - тема/коллекции
+  - тема/collections
+  - статус/завершён
+уровень: средний
+изменяемый: false
+хешируемый: true
+dict_key: true
+итерируемый: true
+стандартная_библиотека: true
+---
+
 ## Пример для быстрой справки
 
 ```python
@@ -752,3 +767,8 @@ Point = namedtuple('Point', ['x', 'y'])
 - [Официальная документация](https://docs.python.org/3/library/collections.html#collections.namedtuple)
 - [PEP 3132](https://www.python.org/dev/peps/pep-3132/) — Extended Iterable Unpacking
 - [Исходный код namedtuple](https://github.com/python/cpython/blob/main/Lib/collections/__init__.py)
+
+## 🔗 Связанные темы
+
+- [[02 — 🔒 Кортежи (tuple) 🔹]]
+- [[04 — 📦 Атрибуты объектов и классов]]

@@ -1,3 +1,19 @@
+---
+tags:
+  - python
+  - тема/типы_данных
+  - тема/коллекции
+  - тема/collections
+  - статус/завершён
+уровень: средний
+изменяемый: true
+хешируемый: false
+dict_key: false
+итерируемый: true
+упорядоченный: true
+стандартная_библиотека: true
+---
+
 ## Пример для быстрой справки
 
 ```python
@@ -747,3 +763,8 @@ d.popitem(last=False)  # ('a', 1) — с начала
 - [PEP 468 — Preserving Keyword Argument Order](https://www.python.org/dev/peps/pep-0468/)
 - [PEP 372 — Adding an ordered dictionary to collections](https://www.python.org/dev/peps/pep-0372/)
 - [Исходный код OrderedDict](https://github.com/python/cpython/blob/main/Lib/collections/__init__.py)
+
+## 🔗 Связанные темы
+
+- [[04 — 📖 Словарь ( dict ) 🔹]]
+- [[04.2  ⤷ Упорядоченность и хранение словаря]]

@@ -1,3 +1,18 @@
+---
+tags:
+  - python
+  - тема/функции
+  - тема/встроенные_функции
+  - тема/functools
+  - статус/завершён
+уровень: средний
+возвращает_итератор: false
+ленивые_вычисления: false
+принимает_key: false
+встроенная: false
+стандартная_библиотека: true
+---
+
 ## Пример для быстрой справки
 
 ```python
@@ -709,3 +724,10 @@ for key, value in data:
 - [Официальная документация functools.reduce](https://docs.python.org/3/library/functools.html#functools.reduce)
 - [PEP 20 — The Zen of Python](https://www.python.org/dev/peps/pep-0020/) (простота важнее)
 - [Guido van Rossum о reduce](https://www.artima.com/weblogs/viewpost.jsp?thread=98196)
+
+## 🔗 Связанные темы
+
+- [[04 — 🧰 functools]]
+- [[00 — 🎯 map()]]
+- [[01 — 🎯 filter()]]
+- [[00 — Встроенные функции Python]]

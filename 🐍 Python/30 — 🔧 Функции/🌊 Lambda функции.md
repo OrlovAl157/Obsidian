@@ -1,3 +1,11 @@
+---
+tags:
+  - python
+  - тема/функции
+  - статус/завершён
+уровень: начальный
+---
+
 # Памятка по лямбда-функциям в Python
 
 ## Пример для быстрой справки
@@ -512,3 +520,12 @@ evens = list(filter(lambda x: x % 2 == 0, numbers))
 
 - [Документация: Lambda expressions](https://docs.python.org/3/reference/expressions.html#lambda)
 - [PEP 8 — Lambda](https://www.python.org/dev/peps/pep-0008/#programming-recommendations)
+
+## 🔗 Связанные темы
+
+- [[00 — 🎯 map()]]
+- [[01 — 🎯 filter()]]
+- [[02 — 🎯 sorted()]]
+- [[00 — Декоратор]]
+- [[00 — Все про замыкание]]
+- [[01 — Чистая функция]]

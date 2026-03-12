@@ -1,3 +1,13 @@
+---
+tags:
+  - python
+  - тема/модули
+  - тема/строки
+  - статус/завершён
+уровень: начальный
+стандартная_библиотека: false
+сторонний_пакет: true
+---
 
 #python #модули
 
@@ -162,3 +172,8 @@ inflection.parameterize("über coöl")               # → "uber-cool"
 |`classify(s)`|таблица → класс|`"user_posts"` → `"UserPost"`|
 |`transliterate(s)`|убирает диакритику|`"André"` → `"Andre"`|
 |`parameterize(s)`|строка → URL-slug|`"Hello World!"` → `"hello-world"`|
+
+## 🔗 Связанные темы
+
+- [[00 — 📖 Основы строк 🔹]]
+- [[03 — 🔤 String константы]]

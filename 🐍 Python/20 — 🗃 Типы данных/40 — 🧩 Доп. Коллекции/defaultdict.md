@@ -1,3 +1,18 @@
+---
+tags:
+  - python
+  - тема/типы_данных
+  - тема/коллекции
+  - тема/collections
+  - статус/завершён
+уровень: средний
+изменяемый: true
+хешируемый: false
+dict_key: false
+итерируемый: true
+стандартная_библиотека: true
+---
+
 ## Пример для быстрой справки
 
 ```python
@@ -642,3 +657,9 @@ except KeyError:
 - [Официальная документация](https://docs.python.org/3/library/collections.html#collections.defaultdict)
 - [PEP 3106](https://www.python.org/dev/peps/pep-3106/) — Revamping dict.keys(), .values() and .items()
 - [Исходный код defaultdict](https://github.com/python/cpython/blob/main/Modules/_collectionsmodule.c)
+
+## 🔗 Связанные темы
+
+- [[04 — 📖 Словарь ( dict ) 🔹]]
+- [[Counter]]
+- [[ChainMap]]
