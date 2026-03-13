@@ -54,7 +54,7 @@ from functools import reduce
 reduce(function, iterable, initializer=None)
 ```
 
-**Параметры:**
+**⚙️ Параметры:**
 
 - `function` — функция, принимающая 2 аргумента
 - `iterable` — итерируемый объект (список, кортеж, строка и т.д.)

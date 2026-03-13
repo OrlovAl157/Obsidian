@@ -88,7 +88,7 @@ log_error('Ошибка!')     # [ERROR] Ошибка!
 log_warning('Внимание!') # [WARNING] Внимание!
 ```
 
-**GUI callbacks:**
+**💻 GUI callbacks:**
 
 ```python
 def on_click(button_id, event):
@@ -205,7 +205,7 @@ greet.__wrapped__('Alice')  # Hello Alice (БЕЗ "Декоратор работ
 @lru_cache(maxsize=128, typed=False)
 ```
 
-**Параметры:**
+**⚙️ Параметры:**
 
 - `maxsize` — размер кэша (None = безлимит)
 - `typed` — различать типы аргументов
@@ -598,7 +598,7 @@ print(double.__name__)  # multiply
 print(double.__doc__)   # Перемножает два числа
 ```
 
-**@wraps использует update_wrapper() внутри!**
+**🔧 @wraps использует update_wrapper() внутри!**
 
 ---
 

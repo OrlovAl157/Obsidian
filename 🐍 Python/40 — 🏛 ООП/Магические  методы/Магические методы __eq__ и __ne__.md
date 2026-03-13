@@ -278,7 +278,7 @@ class MyClass:
     # __ne__, __gt__, __le__, __ge__ — @total_ordering реализует автоматически
 ```
 
-**Алгоритм `NotImplemented` при `p1 == p2`:**
+**🧮 Алгоритм `NotImplemented` при `p1 == p2`:**
 
 1. `p1.__eq__(p2)` → если `True`/`False` → результат
 2. → если `NotImplemented` → пробует `p2.__eq__(p1)`

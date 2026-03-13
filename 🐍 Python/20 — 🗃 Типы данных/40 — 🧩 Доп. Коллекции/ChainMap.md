@@ -66,7 +66,7 @@ combined.update(dict2)  # Значения перезапишутся!
 chain = ChainMap(dict1, dict2)  # Сохраняет все значения
 ```
 
-**Преимущества ChainMap:**
+**✅ Преимущества ChainMap:**
 
 - 🔗 Не создает копии данных
 - 🔍 Сохраняет доступ ко всем значениям (даже с одинаковыми ключами)
@@ -435,7 +435,7 @@ print(config)
 # ChainMap({'debug': False, 'port': 8080}) — не изменился
 ```
 
-**Эквивалентно:**
+**⚖️ Эквивалентно:**
 
 ```python
 chain.new_child(m) == ChainMap(m, *chain.maps)
@@ -468,7 +468,7 @@ print(type(parents))
 # <class 'collections.ChainMap'>
 ```
 
-**Эквивалентно:**
+**⚖️ Эквивалентно:**
 
 ```python
 chain.parents == ChainMap(*chain.maps[1:])
@@ -970,7 +970,7 @@ print(f"ChainMap size: {sys.getsizeof(chain)} bytes")
 # ChainMap значительно меньше
 ```
 
-**Особенности:**
+**💡 Особенности:**
 
 - ✅ Создание: O(1) — очень быстро
 - ✅ Память: не копирует данные

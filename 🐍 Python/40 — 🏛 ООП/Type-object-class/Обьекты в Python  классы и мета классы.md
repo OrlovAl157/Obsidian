@@ -374,7 +374,7 @@ print(issubclass(Husky, Dog))   # True
 
 ## 🎓 РЕЗЮМЕ
 
-**Запомни главное:**
+**💡 Запомни главное:**
 
 1. **object** — прародитель всех **объектов** (экземпляров)
 2. **type** — прародитель всех **классов**
@@ -389,7 +389,7 @@ print(f"isinstance(type, object) = {isinstance(type, object)}")   # True
 print(f"isinstance(object, type) = {isinstance(object, type)}")   # True
 ```
 
-**Практический вывод:**
+**🛠️ Практический вывод:**
 
 - В 99% случаев используй `isinstance()` для проверки типов
 - `type()` используй когда нужен точный тип без наследования

@@ -148,7 +148,7 @@ tree = ast.parse(code)
 print(ast.dump(tree, indent=2))
 ```
 
-**Визуализация AST:**
+**📊 Визуализация AST:**
 
 ```
         Assign
@@ -270,7 +270,7 @@ dis.dis(code1)
 Bytecode → PVM → Операции с памятью → Результат
 ```
 
-**Как работает PVM:**
+**🔍 Как работает PVM:**
 
 ```python
 # Bytecode
