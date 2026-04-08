@@ -620,4 +620,4 @@ list(filter(lambda x: x > 0, numbers))
 - [[06 — 🎯 reduce()]]
 - [[🌊 Lambda функции]]
 - [[01 — 📋 Cписки ( list ) 🔹]]
-- [[00 — Встроенные функции Python]]
+- [[00 — 🎯 Встроенные функции Python]]

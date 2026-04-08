@@ -730,4 +730,4 @@ for key, value in data:
 - [[04 — 🧰 functools]]
 - [[00 — 🎯 map()]]
 - [[01 — 🎯 filter()]]
-- [[00 — Встроенные функции Python]]
+- [[00 — 🎯 Встроенные функции Python]]

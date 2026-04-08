@@ -528,4 +528,4 @@ top3 = sorted(numbers, reverse=True)[:3]  # → [9, 8, 5]
 
 - [[02 — 🎯 sorted()]]
 - [[🌊 Lambda функции]]
-- [[00 — Встроенные функции Python]]
+- [[00 — 🎯 Встроенные функции Python]]
