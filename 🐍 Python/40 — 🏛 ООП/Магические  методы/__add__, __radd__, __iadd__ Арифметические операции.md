@@ -94,6 +94,8 @@ bank3 = bank1 + bank2     # → PiggyBank(25)
 > banks = [PiggyBank(10), PiggyBank(20), PiggyBank(30)]
 > print(sum(banks))   # → PiggyBank(60)
 > ```
+> 
+> ⚠️ `sum()` начинает с `0`, поэтому первый вызов — `0 + PiggyBank(10)`. Это значит нужен `__radd__`, иначе `TypeError`. Без `__radd__` `sum()` не работает.
 
 -----
 
@@ -129,27 +131,27 @@ print(5 + bank)   # ❌ → (5).__add__(bank) → int не знает про Pig
 ```
 a + b
   │
-  ▼
-a.__add__(b)
+  ├── type(b) < type(a)? (b — подкласс a)
+  │        │
+  │        └── да → b.__radd__(a)
+  │                    │
+  │                    ├── результат ────────────────────► готово
+  │                    │
+  │                    └── NotImplemented → a.__add__(b)
+  │                                            │
+  │                                            ├── результат ──► готово
+  │                                            │
+  │                                            └── NotImplemented → TypeError
   │
-  ├── результат  ────────────────────────────► готово
-  │
-  └── NotImplemented
-        │
-        ▼
-   issubclass(type(b), type(a))?
-        │
-        ├── ДА ──────────────────────────────► сначала b.__radd__(a)
-        │          (подкласс получает приоритет)
-        │
-        └── НЕТ
-              │
-              ▼
-         b.__radd__(a)
-              │
-              ├── результат  ────────────────► готово
-              │
-              └── NotImplemented ────────────► TypeError
+  └── нет → a.__add__(b)
+                │
+                ├── результат ────────────────────────────► готово
+                │
+                └── NotImplemented → b.__radd__(a)
+                                        │
+                                        ├── результат ──────► готово
+                                        │
+                                        └── NotImplemented → TypeError
 ```
 
 > ⚠️ `TypeError` возникает только если **оба** метода вернули `NotImplemented`.
@@ -179,6 +181,7 @@ class PiggyBank:
 
     def __radd__(self, other):
         return self.__add__(other)   # делегируем в __add__, т.к. сложение коммутативно
+                                     # также нужен для sum() — он вызывает 0 + self
 
 
 bank = PiggyBank(10)
@@ -385,7 +388,7 @@ class PiggyBank:
             return PiggyBank(self.coins + other.coins)
         return NotImplemented
 
-    # Отражённый — для случая: 5 + bank
+    # Отражённый — для случая: 5 + bank  и для sum()
     def __radd__(self, other):
         return self.__add__(other)   # коммутативно — делегируем
 
@@ -415,7 +418,7 @@ print(15 - bank1)     # → PiggyBank(5)   — __rsub__: 15 - 10
 bank1 += 10           # → __iadd__, тот же объект
 print(bank1)          # → PiggyBank(20)
 
-# sum() работает благодаря __add__ и __radd__:
+# sum() работает благодаря __radd__ (вызывает 0 + первый элемент):
 print(sum([PiggyBank(10), PiggyBank(20), PiggyBank(30)]))   # → PiggyBank(60)
 ```
 
