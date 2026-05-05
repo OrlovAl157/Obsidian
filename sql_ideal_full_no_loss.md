@@ -65,6 +65,13 @@ tags:
 | FROM | Указывает таблицу-источник | FROM Users |
 | LIMIT | Ограничивает число строк результата | LIMIT 5 |
 | LIMIT offset, n | Пропускает offset строк и выводит n строк | LIMIT 10, 5 |
+Пример:
+
+```sql
+SELECT title, director
+FROM Films
+LIMIT 5;
+```
 
 ### DISTINCT — уникальные значения
 
@@ -81,14 +88,6 @@ FROM Users;
 ```
 
 Уникальность определяется по комбинации всех выбранных столбцов.
-
-Пример:
-
-```sql
-SELECT title, director
-FROM Films
-LIMIT 5;
-```
 
 ---
 
