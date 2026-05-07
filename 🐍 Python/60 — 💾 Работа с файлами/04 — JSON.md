@@ -34,6 +34,14 @@ tags:
 `dumps()` и `loads()` — строка. 
 Различить легко, в методах `dumps()` и `loads()` последняя буква `s` — string, строка.
 
+```
+dumps: dict → JSON string
+loads: JSON string → dict
+
+dump:  dict → JSON file
+load:  JSON file → dict
+```
+
 | Метод | Назначение | Работает с | Пример |
 |---|---|---|---|
 | `json.dumps()` | Сериализует в строку | Объект → строка | `s = json.dumps(data)` |
