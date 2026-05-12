@@ -3,6 +3,7 @@ tags:
   - python
   - тема/ооп
   - тема/дескрипторы
+  - тема/магические_методы
   - статус/справка
 уровень: продвинутый
 ---
@@ -147,10 +148,11 @@ __getattribute__ / __setattr__
 
 ## Связанные темы
 
-- [[05 — Свойства property() и @property]]
-- [[06 — Типы методов @classmethod и @staticmethod]]
-- [[08 — Декоратор-класс]]
+- [[05 — 🏠 Свойства property() и @property]]
+- [[Атрибуты объекта getter setter]]
+- [[06 — 🔧 Типы методов @classmethod и @staticmethod]]
+- [[03 — 🔍 Протокол дескрипторов]]
 
 ---
 
-#python/descriptors #oop #protocols #справка
+#python/descriptors #oop #protocols #магические_методы #справка
