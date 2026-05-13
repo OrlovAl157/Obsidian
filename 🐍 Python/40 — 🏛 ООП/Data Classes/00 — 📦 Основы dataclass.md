@@ -12,26 +12,23 @@ tags:
 
 ## ⚡ БЫСТРАЯ СПРАВКА
 
-### Основные параметры и приёмы
-
 | Что нужно | Код | Описание |
 |---|---|---|
-| **Создать простой dataclass** | `@dataclass`<br>`class Person:`<br>`    name: str` | Автоматически создаёт `__init__`, `__repr__`, `__eq__` |
+| **Создать dataclass** | `@dataclass`<br>`class Person:`<br>`    name: str` | Автоматически создаёт `__init__`, `__repr__`, `__eq__` |
 | **Значение по умолчанию** | `age: int = 30` | Простое значение по умолчанию |
-| **Изменяемый тип (список)** | `friends: list = field(default_factory=list)` | ОБЯЗАТЕЛЬНО для списков/словарей! |
-| **Неизменяемый объект** | `@dataclass(frozen=True)` | Объект нельзя менять после создания |
-| **Сравнение (<, >, и т.д.)** | `@dataclass(order=True)` | Добавляет методы `<`, `>`, `<=`, `>=` |
-| **Скрыть поле из `__repr__`** | `field(repr=False)` | Поле не выводится при `print()` |
-| **Исключить из сравнения** | `field(compare=False)` | Поле не учитывается в `==` |
-| **Вычисляемое поле** | `field(init=False)` + `__post_init__` | Поле вычисляется, не передаётся в конструктор |
-| **Вывести как кортеж** | `astuple(obj)` | Преобразование в кортеж |
-| **Вывести как словарь** | `asdict(obj)` | Преобразование в словарь |
+| **Изменяемый тип** | `friends: list = field(default_factory=list)` | ОБЯЗАТЕЛЬНО для списков/словарей! |
+| **Неизменяемый** | `@dataclass(frozen=True)` | Объект нельзя менять после создания |
+| **Сравнение** | `@dataclass(order=True)` | Добавляет методы `<`, `>`, `<=`, `>=` |
+| **Скрыть из repr** | `field(repr=False)` | Поле не выводится при print() |
+| **Исключить сравнение** | `field(compare=False)` | Поле не учитывается в == |
+| **Вычисляемое поле** | `field(init=False)` + `__post_init__` | Вычисляется в __post_init__ |
+| **Кортеж/словарь** | `astuple(obj)` / `asdict(obj)` | Преобразование объекта |
 
 ---
 
 ## 🎯 СРАВНЕНИЕ: dataclass vs обычный класс
 
-### ❌ БЕЗ dataclass (15 строк кода)
+### ❌ БЕЗ dataclass (15 строк)
 
 ```python
 class Person:
@@ -51,7 +48,7 @@ class Person:
                 self.age == other.age)
 ```
 
-### ✅ С dataclass (3 строки кода)
+### ✅ С dataclass (3 строки)
 
 ```python
 from dataclasses import dataclass
@@ -71,7 +68,7 @@ class Person:
 
 ### Что это?
 
-**Data Classes** — декоратор `@dataclass`, который автоматически генерирует стандартные методы для классов, предназначенных для хранения данных.
+**Data Classes** — декоратор `@dataclass`, который автоматически генерирует стандартные методы для классов хранения данных.
 
 ### Три автоматических метода
 
@@ -100,8 +97,6 @@ class Person:
 ### Простое создание
 
 ```python
-from dataclasses import dataclass
-
 @dataclass
 class Person:
     name: str
@@ -109,9 +104,6 @@ class Person:
     age: int
 
 person = Person('Гвидо', 'ван Россум', 67)
-print(person.name)      # → Гвидо
-print(person.surname)   # → ван Россум
-print(person.age)       # → 67
 ```
 
 ### Значения по умолчанию
@@ -125,9 +117,6 @@ class Person:
 
 person1 = Person('Гвидо', 'ван Россум')
 person2 = Person('Илон', 'Маск', 51)
-
-print(person1)  # → Person(name='Гвидо', surname='ван Россум', age=None)
-print(person2)  # → Person(name='Илон', surname='Маск', age=51)
 ```
 
 ### ⚠️ ПРАВИЛО: обязательные поля ПЕРЕД опциональными
@@ -136,28 +125,26 @@ print(person2)  # → Person(name='Илон', surname='Маск', age=51)
 # ❌ НЕПРАВИЛЬНО
 @dataclass
 class Person:
-    name: str = None      # ← с default
-    age: int              # ❌ ОШИБКА: обязательное ПОСЛЕ опционального
-
-# TypeError: non-default argument 'age' follows default argument
+    name: str = None
+    age: int  # ← ошибка!
 
 # ✅ ПРАВИЛЬНО
 @dataclass
 class Person:
-    name: str             # обязательное
-    age: int = 30         # опциональное (после обязательного)
+    name: str
+    age: int = 30
 ```
 
 ### `frozen=True` — неизменяемость
 
 ```python
 @dataclass(frozen=True)
-class ImmutablePoint:
+class Point:
     x: float
     y: float
 
-p = ImmutablePoint(1, 2)
-p.x = 3  # ❌ FrozenInstanceError: cannot assign to field 'x'
+p = Point(1, 2)
+p.x = 3  # ❌ FrozenInstanceError
 ```
 
 ### `order=True` — методы сравнения
@@ -171,15 +158,14 @@ class Person:
 p1 = Person('Гвидо', 67)
 p2 = Person('Илон', 51)
 
-print(p1 > p2)   # → False (сначала сравнивает name)
-print(p1 < p2)   # → True
+print(p1 > p2)  # → False
 ```
 
 ---
 
 ## 🔧 РАБОТА С ПОЛЯМИ: field()
 
-### ❌ ПРОБЛЕМА: изменяемые типы как default
+### ❌ ПРОБЛЕМА: изменяемые типы
 
 ```python
 @dataclass
@@ -189,9 +175,9 @@ class Team:
 # ValueError: mutable default <class 'list'> for field members is not allowed
 ```
 
-**Почему ошибка?** Значение по умолчанию создаётся ОДИН РАЗ при определении класса. Все экземпляры будут **разделять ОДИН список**!
+**Почему?** Значение по умолчанию создаётся ОДИН РАЗ. Все экземпляры разделяют ОДИН список!
 
-### ✅ РЕШЕНИЕ: `field(default_factory=...)`
+### ✅ РЕШЕНИЕ: `default_factory`
 
 ```python
 from dataclasses import dataclass, field
@@ -205,85 +191,32 @@ t2 = Team()
 t1.members.append('Alice')
 
 print(t1.members)  # → ['Alice']
-print(t2.members)  # → [] ✅ Пусто, как надо!
+print(t2.members)  # → [] ✅
 ```
 
-**Как работает:** При создании каждого объекта вызывается `list()` и создаётся **новый** список.
-
-### Параметры `field()`
-
-#### `default=...` для простых значений
+### Параметры field()
 
 ```python
-from dataclasses import dataclass, field
+# Скрыть из __repr__
+password: str = field(repr=False)
 
-@dataclass
-class Person:
-    name: str
-    age: int = field(default=0)  # то же самое, что = 0
+# Исключить из сравнения
+id: int = field(compare=False)
 
-person = Person('Гвидо')
-print(person.age)  # → 0
-```
+# Исключить из конструктора
+fullname: str = field(init=False)
 
-#### `repr=False` — скрыть из `__repr__`
-
-```python
-@dataclass
-class User:
-    name: str
-    password: str = field(repr=False)  # не выводим пароль
-
-user = User('Alice', 'secret123')
-print(user)  # → User(name='Alice')
-print(user.password)  # → secret123 (есть, но не выводится)
-```
-
-#### `compare=False` — исключить из сравнения
-
-```python
-@dataclass
-class Person:
-    name: str
-    age: int = field(compare=False)
-
-p1 = Person('Гвидо', 67)
-p2 = Person('Гвидо', 68)
-
-print(p1 == p2)  # → True (age не сравнивается)
-```
-
-#### `init=False` — исключить из конструктора
-
-```python
-@dataclass
-class Person:
-    name: str
-    age: int = field(init=False)
-
-person = Person('Гвидо')  # ✅ Без age
-print(hasattr(person, 'age'))  # → False (атрибута нет)
-```
-
-**С default:**
-```python
-@dataclass
-class Person:
-    name: str
-    age: int = field(init=False, default=0)
-
-person = Person('Гвидо')
-print(person.age)  # → 0 (есть default)
+# Простое значение по умолчанию
+age: int = field(default=0)
 ```
 
 ---
 
-## 📝 ТИПИЗАЦИЯ И HINTS
+## 📝 ТИПИЗАЦИЯ
 
 ### `typing.Any` — если тип неизвестен
 
 ```python
-from dataclasses import dataclass
 from typing import Any
 
 @dataclass
@@ -292,10 +225,6 @@ class Container:
     data: Any  # может быть что угодно
 
 container = Container('config', {'key': 'value'})
-print(container)  # → Container(name='config', data={'key': 'value'})
-
-container2 = Container('numbers', [1, 2, 3])
-print(container2)  # → Container(name='numbers', data=[1, 2, 3])
 ```
 
 ---
@@ -305,26 +234,6 @@ print(container2)  # → Container(name='numbers', data=[1, 2, 3])
 ### Вычисляемые атрибуты
 
 ```python
-from dataclasses import dataclass
-
-@dataclass
-class Person:
-    name: str
-    surname: str
-    fullname: str = None
-    
-    def __post_init__(self):
-        self.fullname = self.name + ' ' + self.surname
-
-person = Person('Гвидо', 'ван Россум')
-print(person.fullname)  # → Гвидо ван Россум
-```
-
-### С `init=False` — не передавать в конструктор
-
-```python
-from dataclasses import dataclass, field
-
 @dataclass
 class Person:
     name: str
@@ -338,10 +247,10 @@ person = Person('Гвидо', 'ван Россум')
 print(person.fullname)  # → Гвидо ван Россум
 ```
 
-### `InitVar` — параметры только для `__post_init__`
+### `InitVar` — параметры только для __post_init__
 
 ```python
-from dataclasses import dataclass, InitVar
+from dataclasses import InitVar
 
 @dataclass
 class Rectangle:
@@ -350,17 +259,17 @@ class Rectangle:
     unit: InitVar[str] = 'cm'
     
     def __post_init__(self, unit):
-        print(f"Прямоугольник в {unit}")
+        print(f"Размер: {unit}")
 
 r = Rectangle(10, 20, 'mm')
-print(hasattr(r, 'unit'))  # → False (нет атрибута)
+print(hasattr(r, 'unit'))  # → False
 ```
 
 ---
 
 ## 👨‍👧 НАСЛЕДОВАНИЕ
 
-### Порядок полей при наследовании
+### Порядок полей
 
 ```python
 @dataclass
@@ -373,10 +282,11 @@ class Dog(Animal):
     breed: str
 
 d = Dog('Rex', 5, 'Лабрадор')
-print(d)  # → Dog(name='Rex', age=5, breed='Лабрадор')
 ```
 
-### ⚠️ Поля с defaults идут в конце
+Dataclass собирает поля: сначала из родителя, потом из потомка. Создаётся ОДИН общий `__init__`.
+
+### ⚠️ С defaults нужна осторожность
 
 ```python
 @dataclass
@@ -386,124 +296,36 @@ class Animal:
 
 @dataclass
 class Dog(Animal):
-    breed: str  # ❌ ОШИБКА! Обязательное поле после опционального
-
-# ✅ ПРАВИЛЬНО:
-@dataclass
-class Dog(Animal):
-    breed: str = "Unknown"
+    breed: str = "Unknown"  # ← обязательно с default!
 ```
 
-### Переопределение `__post_init__` в наследнике
+### __post_init__ в наследнике
 
 ```python
-@dataclass
-class Animal:
-    name: str
-    
-    def __post_init__(self):
-        print(f"Создано животное {self.name}")
-
 @dataclass
 class Dog(Animal):
     breed: str
     
     def __post_init__(self):
-        super().__post_init__()  # ← Вызовем родителя!
+        super().__post_init__()  # ← вызови родителя!
         print(f"Порода: {self.breed}")
-
-d = Dog('Rex', 'Лабрадор')
-# Вывод:
-# Создано животное Rex
-# Порода: Лабрадор
 ```
 
 ---
 
-## 🎲 ДИНАМИЧЕСКОЕ СОЗДАНИЕ: make_dataclass()
+## 🛠️ УТИЛИТЫ
 
-### Простое создание
+### astuple() и asdict()
 
 ```python
-from dataclasses import make_dataclass
-
-Person = make_dataclass('Person', [
-    ('name', str),
-    ('surname', str),
-    ('age', int),
-])
+from dataclasses import astuple, asdict
 
 person = Person('Гвидо', 'ван Россум', 67)
-print(person)  # → Person(name='Гвидо', surname='ван Россум', age=67)
-```
 
-### С значениями по умолчанию
+print(astuple(person))
+# → ('Гвидо', 'ван Россум', 67)
 
-```python
-from dataclasses import make_dataclass, field
-
-Person = make_dataclass('Person', [
-    ('name', str),
-    ('surname', str),
-    ('age', int, field(default=0)),
-    ('tags', list, field(default_factory=list)),
-])
-
-person = Person('Alice', 'Smith')
-print(person)  # → Person(name='Alice', surname='Smith', age=0, tags=[])
-```
-
-### С параметрами и методами
-
-```python
-Person = make_dataclass('Person', 
-    [('name', str), ('age', int)],
-    frozen=True,
-    namespace={
-        'greet': lambda self: f"Hello, {self.name}!"
-    }
-)
-
-person = Person('Гвидо', 67)
-print(person.greet())  # → Hello, Гвидо!
-```
-
-### Три формата полей в make_dataclass()
-
-```python
-Person = make_dataclass('Person', [
-    'name',                          # формат 1: только имя (Any)
-    ('age', int),                    # формат 2: имя и тип
-    ('email', str, field(default='')), # формат 3: имя, тип и field()
-])
-```
-
----
-
-## 🛠️ УТИЛИТЫ: astuple() и asdict()
-
-### Преобразование в кортеж
-
-```python
-from dataclasses import dataclass, astuple
-
-@dataclass
-class Person:
-    name: str
-    surname: str
-    age: int
-
-person = Person('Гвидо', 'ван Россум', 67)
-print(astuple(person))  # → ('Гвидо', 'ван Россум', 67)
-```
-
-### Преобразование в словарь
-
-```python
-from dataclasses import dataclass, asdict
-
-person = Person('Гвидо', 'ван Россум', 67)
-print(asdict(person))  
+print(asdict(person))
 # → {'name': 'Гвидо', 'surname': 'ван Россум', 'age': 67}
 ```
 
@@ -511,17 +333,17 @@ print(asdict(person))
 
 ## 🎯 КОГДА ИСПОЛЬЗОВАТЬ dataclass
 
-### ✅ ИСПОЛЬЗУЙ dataclass
+### ✅ ИСПОЛЬЗУЙ
 
 - Простое хранилище данных (API response, конфиг, DTO)
 - Много атрибутов, простая логика
-- Нужна стандартная функциональность (`__init__`, `__repr__`, `__eq__`)
+- Нужна стандартная функциональность
 - Конфиги и настройки
 - Кэширование результатов
 
-### ❌ НЕ используй dataclass
+### ❌ НЕ ИСПОЛЬЗУЙ
 
-- Сложная логика класса (много методов)
+- Сложная логика класса
 - Часто переписываешь `__init__`
 - Сложное наследование
 - Нужна валидация → используй `pydantic`
@@ -538,14 +360,13 @@ print(asdict(person))
 ✅ `init=False` исключает поле из конструктора  
 ✅ `frozen=True` делает объекты неизменяемыми  
 ✅ `order=True` добавляет методы сравнения  
-✅ При наследовании вызови `super().__post_init__()` если оверрайдишь  
+✅ При наследовании вызови `super().__post_init__()`  
 
 ---
 
 ## 🔗 Связанные темы
 
-- [[01 — 🚀 Продвинутые возможности dataclass]]
-- [[02 — 🔧 Как dataclass работает]]
+- [[01 — 🚀 Всё про dataclass (продвинутый уровень)]]
 - [[00 — Признаки ООП]]
 - [[06 — 🔧 Типы методов @classmethod и @staticmethod]]
 
