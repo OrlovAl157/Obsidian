@@ -141,6 +141,236 @@ Descriptor protocol
 __getattribute__ / __setattr__
     ↓
 управляют самим ОБЪЕКТОМ
+
+
+====================================================
+       ITEM PROTOCOL (индексация)
+====================================================
+
+Используется для доступа к элементам через квадратные скобки.
+Независим от descriptor protocol и __getattr__.
+
+class MyContainer:
+    items = [1, 2, 3]
+
+----------------------------------------------------
+
+__getitem__(self, key)
+    ↓
+Вызывается при:
+    obj[key]
+
+Отвечает за получение элемента по ключу/индексу.
+Работает для dict, list, custom контейнеров.
+
+Пример:
+    d['name']
+    list[0]
+    custom_obj[index]
+
+----------------------------------------------------
+
+__setitem__(self, key, value)
+    ↓
+Вызывается при:
+    obj[key] = value
+
+Отвечает за присваивание значения элементу.
+
+Пример:
+    d['name'] = 'Alice'
+    list[0] = 42
+
+----------------------------------------------------
+
+__delitem__(self, key)
+    ↓
+Вызывается при:
+    del obj[key]
+
+Отвечает за удаление элемента.
+
+Пример:
+    del d['name']
+    del list[0]
+
+----------------------------------------------------
+
+__len__(self)
+    ↓
+Вызывается при:
+    len(obj)
+
+Возвращает количество элементов.
+
+Возвращает целое число.
+
+
+====================================================
+      ITERATION PROTOCOL (итерация)
+====================================================
+
+Используется для перебора элементов в цикле.
+
+for item in obj:
+    ...
+
+----------------------------------------------------
+
+__iter__(self)
+    ↓
+Вызывается при:
+    for x in obj
+
+Должен вернуть объект итератора.
+Итератор должен иметь метод __next__.
+
+Пример:
+    def __iter__(self):
+        return iter(self.items)
+
+----------------------------------------------------
+
+__next__(self)
+    ↓
+Вызывается в итераторе.
+
+Возвращает следующий элемент.
+Выбрасывает StopIteration когда элементы закончились.
+
+Пример:
+    def __next__(self):
+        if self.index >= len(self.items):
+            raise StopIteration
+        value = self.items[self.index]
+        self.index += 1
+        return value
+
+----------------------------------------------------
+
+__reversed__(self)
+    ↓
+Вызывается при:
+    reversed(obj)
+
+Возвращает объект обратного итератора.
+Опционально (нужно для reversed()).
+
+
+====================================================
+           ПОЛНОЕ СРАВНЕНИЕ
+====================================================
+
+obj.attr
+    ↓
+__getattribute__ → Descriptor.__get__ → __getattr__
+
+obj[key]
+    ↓
+__getitem__ (НАПРЯМУЮ, без дополнительных слоёв)
+
+for x in obj
+    ↓
+__iter__ → __next__ (полный цикл итерации)
+
+len(obj)
+    ↓
+__len__ (просто вызов)
+
+
+====================================================
+        КЛЮЧЕВЫЕ РАЗЛИЧИЯ
+====================================================
+
+АТРИБУТЫ (точка):
+    obj.attr
+    ↓
+    Иерархия: __getattribute__ → descriptor → __getattr__
+    Работают: property, @property, @classmethod
+
+ЭЛЕМЕНТЫ (квадратные скобки):
+    obj[key]
+    ↓
+    Прямой вызов __getitem__
+    Работают: dict, list, custom контейнеры
+    НЕ используют __getattr__
+
+ИТЕРАЦИЯ (цикл for):
+    for x in obj
+    ↓
+    Использует: __iter__ → __next__
+    Альтернатива: __getitem__ с индексом (старый стиль)
+
+РАЗМЕР:
+    len(obj)
+    ↓
+    Прямой вызов __len__
+    Возвращает целое число >= 0
+
+
+====================================================
+        ПРИМЕРЫ ИСПОЛЬЗОВАНИЯ
+====================================================
+
+# Property (attribute access)
+class User:
+    def __init__(self, age):
+        self._age = age
+    
+    @property
+    def age(self):
+        return self._age
+    
+    @age.setter
+    def age(self, value):
+        self._age = value
+
+user = User(25)
+user.age = 26  # вызывает __set__ property
+
+
+# Custom dict (item access)
+class MyDict:
+    def __init__(self):
+        self.data = {}
+    
+    def __getitem__(self, key):
+        return self.data[key]
+    
+    def __setitem__(self, key, value):
+        self.data[key] = value
+    
+    def __delitem__(self, key):
+        del self.data[key]
+    
+    def __len__(self):
+        return len(self.data)
+
+d = MyDict()
+d['name'] = 'Alice'  # вызывает __setitem__
+print(d['name'])     # вызывает __getitem__
+del d['name']        # вызывает __delitem__
+print(len(d))        # вызывает __len__
+
+
+# Custom iterable
+class Counter:
+    def __init__(self, max):
+        self.max = max
+        self.current = 0
+    
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if self.current < self.max:
+            self.current += 1
+            return self.current
+        else:
+            raise StopIteration
+
+for i in Counter(3):
+    print(i)  # выведет 1, 2, 3
 ```
 
 ---
