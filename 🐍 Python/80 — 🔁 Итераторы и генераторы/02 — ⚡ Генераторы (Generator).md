@@ -29,14 +29,14 @@ tags:
 
 ## 🚀 Быстрая справка
 
-| Задача | Способ | Пример |
-|---|---|---|
-| Функция-генератор | `def f(): yield x` | `def gen(): yield 1` |
-| Генераторное выражение | `(expr for x in it)` | `(x**2 for x in range(5))` |
-| Следующий элемент | `next(gen)` | `next(gen)` → `0` |
-| Делегирование | `yield from iterable` | `yield from range(5)` |
-| Все элементы | `list(gen)` | `list(gen)` → `[0, 1, 2]` |
-| Распаковка | `print(*gen)` | `print(*gen)` |
+| Задача                 | Способ                | Пример                     |
+| ---------------------- | --------------------- | -------------------------- |
+| Функция-генератор      | `def f(): yield x`    | `def gen(): yield 1`       |
+| Генераторное выражение | `(expr for x in it)`  | `(x**2 for x in range(5))` |
+| Следующий элемент      | `next(gen)`           | `next(gen)` → `0`          |
+| Делегирование          | `yield from iterable` | `yield from range(5)`      |
+| Все элементы           | `list(gen)`           | `list(gen)` → `[0, 1, 2]`  |
+| Распаковка             | `print(*gen)`         | `print(*gen)`              |
 
 ---
 
