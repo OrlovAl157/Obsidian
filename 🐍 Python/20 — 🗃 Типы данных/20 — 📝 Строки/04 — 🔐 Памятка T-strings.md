@@ -9,7 +9,7 @@ tags:
 уровень: продвинутое
 ---
 
-# 08 — 🔐 Памятка: T-строки (Template strings) в Python 3.14
+# 🔐 Памятка: T-строки (Template strings) в Python 3.14
 
 ## 🎯 Суть в 30 секунд
 
