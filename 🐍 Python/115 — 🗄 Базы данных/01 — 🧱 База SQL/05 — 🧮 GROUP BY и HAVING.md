@@ -388,6 +388,60 @@ GROUP BY month;
 
 ---
 
+## 🔀 Сортировка и порядок выполнения
+
+Сгруппированные данные можно сортировать обычным `ORDER BY`.
+
+**Примеры:**
+
+```sql
+SELECT 
+    city,
+    COUNT(*) as cnt
+FROM Users
+GROUP BY city
+ORDER BY COUNT(*) DESC;
+```
+
+```sql
+SELECT 
+    city,
+    COUNT(*) as cnt
+FROM Users
+GROUP BY city
+ORDER BY cnt DESC
+LIMIT 5;
+```
+
+**Порядок записи операторов в запросе:**
+
+`SELECT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT`
+
+**Порядок выполнения:**
+
+`FROM -> WHERE -> GROUP BY -> HAVING -> SELECT -> ORDER BY -> LIMIT`
+
+---
+
+## 🧩 Полезные нюансы
+
+- `NULL` в `GROUP BY` считается отдельной группой, и все `NULL`-значения попадают вместе
+- в `GROUP BY`, `HAVING` и `ORDER BY` часто можно использовать псевдонимы, но поведение зависит от СУБД
+- если псевдоним совпадает с именем столбца, некоторые СУБД могут выбрать именно столбец таблицы
+- `GROUP BY` во многих случаях близок к `DISTINCT`
+
+```sql
+SELECT artist
+FROM Songs
+GROUP BY artist;
+
+-- Почти то же самое:
+SELECT DISTINCT artist
+FROM Songs;
+```
+
+---
+
 ## 💡 Практические замечания
 
 - **GROUP BY без агрегатов** — редко нужно, обычно есть COUNT() или другая агрегат
