@@ -262,7 +262,7 @@ def print_all(items: Iterable[str]) -> None:
 ## Связанные темы
 
 - [[00 — 📘 Аннотации типов — основы]]
-- [[01 — 🧰 typing: Union, Optional, Any и др.]]
+- [[01 — 🧰 typing, Union, Optional и др.]]
 - [[03 — 🔗 Callable, Protocol и структурная типизация]]
-- [[04 — 🎨 Generics: TypeVar, Generic, ParamSpec]]
-- [[05 — ✅ Проверка типов: mypy, pyright и практика]]
+- [[04 — 🎨 Generics, TypeVar, Generic, ParamSpec]]
+- [[05 — ✅ Проверка типов, mypy, pyright и практика]]

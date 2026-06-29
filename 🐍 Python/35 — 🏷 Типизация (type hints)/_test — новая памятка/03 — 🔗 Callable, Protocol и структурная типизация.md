@@ -185,7 +185,7 @@ def first_two(items: Sequence[str]) -> tuple[str, str]:
 ## Связанные темы
 
 - [[00 — 📘 Аннотации типов — основы]]
-- [[01 — 🧰 typing: Union, Optional, Any и др.]]
+- [[01 — 🧰 typing, Union, Optional и др.]]
 - [[02 — 📦 Коллекции, TypedDict и аннотации объектов]]
-- [[04 — 🎨 Generics: TypeVar, Generic, ParamSpec]]
-- [[05 — ✅ Проверка типов: mypy, pyright и практика]]
+- [[04 — 🎨 Generics, TypeVar, Generic, ParamSpec]]
+- [[05 — ✅ Проверка типов, mypy, pyright и практика]]
