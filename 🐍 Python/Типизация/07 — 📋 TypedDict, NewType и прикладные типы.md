@@ -148,24 +148,24 @@ class User(TypedDict, total=False):
 
 ## 🧪 Runtime и реальные примеры
 
-### TypedDict в runtime
+### `TypedDict` в runtime
 
-Важно помнить: во время выполнения TypedDict ведёт себя как обычный dict.
+Важно помнить: во время выполнения `TypedDict` ведёт себя как обычный `dict`.
 
-`python
+```python
 from typing import TypedDict
 
 
 class User(TypedDict):
     name: str
     surname: str
-`
+```
 
 Для Python это всё ещё словарь, просто с более точным описанием структуры для анализатора типов.
 
-### TypedDict для API-ответа
+### `TypedDict` для API-ответа
 
-`python
+```python
 from typing import TypedDict
 
 
@@ -173,11 +173,11 @@ class UserResponse(TypedDict):
     id: int
     name: str
     email: str
-`
+```
 
-### NewType для разных ID
+### `NewType` для разных ID
 
-`python
+```python
 from typing import NewType
 
 UserId = NewType("UserId", int)
@@ -186,14 +186,14 @@ OrderId = NewType("OrderId", int)
 
 def load_user(user_id: UserId) -> None:
     pass
-`
+```
 
 Теперь анализатор сможет поймать ситуацию, когда перепутали разные идентификаторы.
 
-`python
+```python
 load_user(UserId(1))   # корректно
 # load_user(OrderId(1))  # ошибка типов
-`
+```
 
 ---
 

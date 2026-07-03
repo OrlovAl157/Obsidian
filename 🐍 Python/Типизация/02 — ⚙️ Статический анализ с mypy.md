@@ -131,23 +131,22 @@ mypy main.py --disallow-untyped-defs
 
 Статические анализаторы умеют сужать тип после проверок.
 
-`python
+```python
 def print_name(name: str | None) -> None:
     if name is not None:
         print(name.upper())
-`
+```
 
-После is not None анализатор уже понимает, что внутри блока 
-ame — это str.
+После `is not None` анализатор уже понимает, что внутри блока `name` — это `str`.
 
 То же самое работает с isinstance():
 
-`python
+```python
 def process(value: int | str) -> str:
     if isinstance(value, str):
         return value.upper()
     return str(value)
-`
+```
 
 ---
 
@@ -157,31 +156,31 @@ def process(value: int | str) -> str:
 
 | Инструмент | Что полезно знать |
 | --- | --- |
-| mypy | классический и очень распространённый type checker |
-| pyright | обычно быстрее, часто хорошо ощущается в IDE |
+| `mypy` | классический и очень распространённый type checker |
+| `pyright` | обычно быстрее, часто хорошо ощущается в IDE |
 
 Базовые команды:
 
-`ash
+```bash
 mypy .
 pyright .
-`
+```
 
-Полезные флаги mypy:
+Полезные флаги `mypy`:
 
-`ash
+```bash
 mypy --strict .
 mypy --ignore-missing-imports .
-`
+```
 
-### # type: ignore
+### `# type: ignore`
 
 Иногда точечно приходится подавить предупреждение:
 
-`python
+```python
 value = legacy_function()  # type: ignore
 result = risky_call()      # type: ignore[assignment]
-`
+```
 
 Использовать это стоит редко, иначе типизация быстро теряет смысл.
 
