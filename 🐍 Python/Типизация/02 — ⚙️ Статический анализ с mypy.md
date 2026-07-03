@@ -1,4 +1,4 @@
----
+﻿---
 tags:
   - python
   - типизация
@@ -20,6 +20,8 @@ tags:
 - [[#🎯 Зачем нужен mypy|Зачем нужен mypy]]
 - [[#🚀 Быстрый старт|Быстрый старт]]
 - [[#🔍 Какие ошибки он ловит|Какие ошибки он ловит]]
+- [[#🎯 Type narrowing|Type narrowing]]
+- [[#🆚 mypy и pyright|mypy и pyright]]
 - [[#⚠️ Что важно понимать|Что важно понимать]]
 - [[#💡 Практические замечания|Практические замечания]]
 
@@ -125,6 +127,66 @@ mypy main.py --disallow-untyped-defs
 
 ---
 
+## 🎯 Type narrowing
+
+Статические анализаторы умеют сужать тип после проверок.
+
+`python
+def print_name(name: str | None) -> None:
+    if name is not None:
+        print(name.upper())
+`
+
+После is not None анализатор уже понимает, что внутри блока 
+ame — это str.
+
+То же самое работает с isinstance():
+
+`python
+def process(value: int | str) -> str:
+    if isinstance(value, str):
+        return value.upper()
+    return str(value)
+`
+
+---
+
+## 🆚 mypy и pyright
+
+Оба инструмента проверяют аннотации без запуска программы.
+
+| Инструмент | Что полезно знать |
+| --- | --- |
+| mypy | классический и очень распространённый type checker |
+| pyright | обычно быстрее, часто хорошо ощущается в IDE |
+
+Базовые команды:
+
+`ash
+mypy .
+pyright .
+`
+
+Полезные флаги mypy:
+
+`ash
+mypy --strict .
+mypy --ignore-missing-imports .
+`
+
+### # type: ignore
+
+Иногда точечно приходится подавить предупреждение:
+
+`python
+value = legacy_function()  # type: ignore
+result = risky_call()      # type: ignore[assignment]
+`
+
+Использовать это стоит редко, иначе типизация быстро теряет смысл.
+
+---
+
 ## ⚠️ Что важно понимать
 
 ### `mypy` не запускает программу
@@ -197,3 +259,4 @@ print(add(a, b) / 2)
 - [[01 — 📖 Основы аннотаций типов]]
 - [[03 — 🧩 Типы модуля typing]]
 - [[120 — 🐛 Отладка и тестирование]]
+

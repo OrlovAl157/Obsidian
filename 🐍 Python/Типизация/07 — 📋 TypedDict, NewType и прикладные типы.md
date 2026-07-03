@@ -1,4 +1,4 @@
----
+﻿---
 tags:
   - python
   - типизация
@@ -21,6 +21,7 @@ tags:
 - [[#🗂 TypedDict|TypedDict]]
 - [[#❓ NotRequired и Required|NotRequired и Required]]
 - [[#⚙️ total=False|total=False]]
+- [[#🧪 Runtime и реальные примеры|Runtime и реальные примеры]]
 - [[#💡 Когда это особенно полезно|Когда это особенно полезно]]
 
 ---
@@ -145,6 +146,57 @@ class User(TypedDict, total=False):
 
 ---
 
+## 🧪 Runtime и реальные примеры
+
+### TypedDict в runtime
+
+Важно помнить: во время выполнения TypedDict ведёт себя как обычный dict.
+
+`python
+from typing import TypedDict
+
+
+class User(TypedDict):
+    name: str
+    surname: str
+`
+
+Для Python это всё ещё словарь, просто с более точным описанием структуры для анализатора типов.
+
+### TypedDict для API-ответа
+
+`python
+from typing import TypedDict
+
+
+class UserResponse(TypedDict):
+    id: int
+    name: str
+    email: str
+`
+
+### NewType для разных ID
+
+`python
+from typing import NewType
+
+UserId = NewType("UserId", int)
+OrderId = NewType("OrderId", int)
+
+
+def load_user(user_id: UserId) -> None:
+    pass
+`
+
+Теперь анализатор сможет поймать ситуацию, когда перепутали разные идентификаторы.
+
+`python
+load_user(UserId(1))   # корректно
+# load_user(OrderId(1))  # ошибка типов
+`
+
+---
+
 ## 💡 Когда это особенно полезно
 
 ### `NewType`
@@ -189,3 +241,4 @@ class User(TypedDict, total=False):
 - [[03 — 🧩 Типы модуля typing]]
 - [[05 — 🧠 TypeVar и Generic]]
 - [[06 — 🎯 ParamSpec и типизация декораторов]]
+

@@ -1,4 +1,4 @@
----
+﻿---
 tags:
   - python
   - типизация
@@ -22,6 +22,8 @@ tags:
 - [[#📊 Таблица интерфейсов collections.abc|Таблица интерфейсов collections.abc]]
 - [[#⚙️ Supports... протоколы|Supports... протоколы]]
 - [[#🧩 Протоколы Protocol|Протоколы Protocol]]
+- [[#🏛 ABC и abstractmethod|ABC и abstractmethod]]
+- [[#🤝 Protocol vs ABC|Protocol vs ABC]]
 - [[#📞 Callable|Callable]]
 - [[#✅ runtime_checkable|runtime_checkable]]
 
@@ -176,6 +178,42 @@ def get_sound(animal: Animal) -> None:
 
 ---
 
+## 🏛 ABC и abstractmethod
+
+Если нужен не структурный интерфейс, а жёсткий контракт через наследование, используют абстрактные базовые классы.
+
+`python
+from abc import ABC, abstractmethod
+
+
+class Animal(ABC):
+    @abstractmethod
+    def sound(self) -> str:
+        pass
+`
+
+Такой класс нельзя нормально использовать без реализации обязательных методов в наследнике.
+
+---
+
+## 🤝 Protocol vs ABC
+
+| Подход | Когда полезен |
+| --- | --- |
+| Protocol | когда важна структура объекта и не хочется требовать наследование |
+| ABC | когда нужен явный контракт и контролируемая иерархия |
+
+Коротко:
+
+- Protocol хорошо ложится на duck typing
+- ABC хорошо подходит для собственного фреймворка или внутреннего API
+- Protocol не требует наследования
+- ABC требует наследования и реализации абстрактных методов
+
+Важно: Protocol можно наследовать только от других протоколов. Смешивать его с номинальными типами вроде Sequence нельзя.
+
+---
+
 ## 📞 Callable
 
 `Callable` используют для аннотации вызываемых объектов: функций, лямбд, экземпляров с `__call__`.
@@ -264,3 +302,4 @@ def first(seq: Sequence[int]) -> int:
 - [[03 — 🧩 Типы модуля typing]]
 - [[05 — 🧠 TypeVar и Generic]]
 - [[06 — 🎯 ParamSpec и типизация декораторов]]
+
