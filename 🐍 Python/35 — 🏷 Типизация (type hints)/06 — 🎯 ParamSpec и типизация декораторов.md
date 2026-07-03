@@ -184,7 +184,7 @@ def doubled[T: (int, float), **P](func: Callable[P, T]) -> Callable[P, T]:
 
 ## 🔗 Связанные темы
 
-- [[00 — 🏠 Главная]]
+- [[🐍 Python/35 — 🏷 Типизация (type hints)/00 — 🏠 Главная]]
 - [[04 — 🔗 Протоколы, Sequence и Callable]]
 - [[05 — 🧠 TypeVar и Generic]]
 - [[07 — 📋 TypedDict, NewType и прикладные типы]]

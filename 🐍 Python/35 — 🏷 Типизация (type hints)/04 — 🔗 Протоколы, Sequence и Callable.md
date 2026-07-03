@@ -298,7 +298,7 @@ def first(seq: Sequence[int]) -> int:
 
 ## 🔗 Связанные темы
 
-- [[00 — 🏠 Главная]]
+-[[🐍 Python/35 — 🏷 Типизация (type hints)/00 — 🏠 Главная]]]
 - [[03 — 🧩 Типы модуля typing]]
 - [[05 — 🧠 TypeVar и Generic]]
 - [[06 — 🎯 ParamSpec и типизация декораторов]]
