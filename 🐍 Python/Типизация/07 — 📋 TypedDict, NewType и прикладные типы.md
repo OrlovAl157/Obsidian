@@ -19,6 +19,8 @@ tags:
 
 - [[#🏷 NewType|NewType]]
 - [[#🗂 TypedDict|TypedDict]]
+- [[#📌 NamedTuple|NamedTuple]]
+- [[#🏷 Annotated|Annotated]]
 - [[#❓ NotRequired и Required|NotRequired и Required]]
 - [[#⚙️ total=False|total=False]]
 - [[#🧪 Runtime и реальные примеры|Runtime и реальные примеры]]
@@ -82,6 +84,43 @@ def full_name(user: User) -> str:
 - понятную форму словаря;
 - подсказки по ключам;
 - проверку обязательных полей.
+
+---
+
+## 📌 NamedTuple
+
+`NamedTuple` — это типизированный именованный кортеж. В отличие от `TypedDict`, он ведёт себя как кортеж, а не как словарь.
+
+```python
+from typing import NamedTuple
+
+
+class Point(NamedTuple):
+    x: int
+    y: int
+```
+
+Такой объект позволяет обращаться к значениям:
+
+- по индексу: `point[0]`
+- по имени: `point.x`
+
+Коротко:
+
+- `NamedTuple` — больше похож на кортеж
+- `TypedDict` — больше похож на словарь
+
+---
+
+## 🏷 Annotated
+
+`Annotated` позволяет дополнить тип метаданными.
+
+```python
+from typing import Annotated
+```
+
+Сам по себе Python не использует эти метаданные напрямую, но они часто важны для экосистемы вроде Pydantic, FastAPI и других библиотек, которые читают аннотации и строят на них валидацию или схемы.
 
 ---
 

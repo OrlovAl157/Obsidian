@@ -20,8 +20,7 @@ tags:
 - [[#🎯 Зачем нужен TypeVar|Зачем нужен TypeVar]]
 - [[#🔁 Один и тот же тип на входе и выходе|Один и тот же тип на входе и выходе]]
 - [[#🧩 Несколько обобщённых типов|Несколько обобщённых типов]]
-- [[#🔒 Ограничения и bound|Ограничения и bound]]
-- [[#🔒 Constraints vs bound|Constraints vs bound]]
+- [[#🔒 Ограничения, constraints и bound|Ограничения, constraints и bound]]
 - [[#🏛 Generic для классов|Generic для классов]]
 - [[#🆕 Новый синтаксис Python 3.12|Новый синтаксис Python 3.12]]
 
@@ -92,7 +91,7 @@ def to_tuple(arg1: T1, arg2: T2) -> tuple[T1, T2]:
 
 ---
 
-## 🔒 Ограничения и bound
+## 🔒 Ограничения, constraints и bound
 
 ### Ограниченный набор типов
 
@@ -103,6 +102,18 @@ T = TypeVar("T", str, bytes)
 ```
 
 Теперь `T` может быть только `str` или `bytes`.
+
+Это пример `constraints`: мы явно перечисляем допустимые типы.
+
+### `AnyStr`
+
+В модуле `typing` есть готовый вариант для частого случая `str | bytes`:
+
+```python
+from typing import AnyStr
+```
+
+По сути это заранее подготовленный `TypeVar`, эквивалентный идее `TypeVar(..., str, bytes)`.
 
 ### `bound`
 
@@ -128,13 +139,9 @@ class SupportsAdd(Protocol):
 T = TypeVar("T", bound=SupportsAdd)
 ```
 
----
-
-## 🔒 Constraints vs bound
+### `constraints` vs `bound`
 
 Это один из самых важных моментов в теме generics: `constraints`, `bound` и обычный `Union` похожи внешне, но означают разное.
-
-### Ограничения через `TypeVar(..., ...)`
 
 ```python
 from typing import TypeVar
@@ -229,6 +236,11 @@ class Pair(Generic[K, V]):
         self.key = key
         self.value = value
 ```
+
+`K` и `V` — это стандартная конвенция именования для словарных структур:
+
+- `K` = key
+- `V` = value
 
 ---
 
