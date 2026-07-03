@@ -1,4 +1,4 @@
----
+﻿---
 tags:
   - python
   - типизация
@@ -129,6 +129,64 @@ T = TypeVar("T", bound=SupportsAdd)
 
 ---
 
+## 🔒 Constraints vs bound
+
+Это один из самых важных моментов в теме generics: constraints, ound и обычный Union похожи внешне, но означают разное.
+
+### Ограничения через TypeVar(..., ...)
+
+`python
+from typing import TypeVar
+
+T = TypeVar("T", int, str)
+
+def pair(a: T, b: T) -> tuple[T, T]:
+    return a, b
+`
+
+Здесь T может быть только int или str, но в рамках одного вызова это должен быть один и тот же согласованный тип.
+
+- pair(1, 2) — корректно
+- pair("a", "b") — корректно
+- pair(1, "b") — некорректно
+
+### ound
+
+`python
+from typing import TypeVar
+
+T = TypeVar("T", bound=int)
+`
+
+ound означает: допустим базовый тип и любые его подтипы. Это не список разрешённых разных типов, а верхняя граница совместимости.
+
+### Обычный Union
+
+`python
+def show(value: int | str) -> None:
+    print(value)
+`
+
+Здесь нет идеи "один и тот же тип на нескольких позициях". Просто каждое отдельное значение может быть либо int, либо str.
+
+### Новый синтаксис Python 3.12
+
+Старой записи
+
+`python
+T = TypeVar("T", int, str)
+`
+
+соответствует запись
+
+`python
+def pair[T: (int, str)](a: T, b: T) -> tuple[T, T]:
+    return a, b
+`
+
+Это именно constraints, а не Union.
+
+---
 ## 🏛 Generic для классов
 
 Если обобщённость нужна не функции, а классу, используют `Generic`.
@@ -252,3 +310,4 @@ class Box[T]:
 - [[03 — 🧩 Типы модуля typing]]
 - [[04 — 🔗 Протоколы, Sequence и Callable]]
 - [[06 — 🎯 ParamSpec и типизация декораторов]]
+
