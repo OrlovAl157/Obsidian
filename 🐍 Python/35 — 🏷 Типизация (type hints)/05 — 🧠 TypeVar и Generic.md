@@ -303,13 +303,16 @@ class Box[T]:
 ### Более живой пример
 
 ```python
+from typing import Self
+
+
 class SkipIterator[T: (int, float)]:
     def __init__(self, lst: list[T], n: int) -> None:
         self.lst = lst
         self.n = n
         self.index: int = 0
 
-    def __iter__(self) -> "SkipIterator[T]":
+    def __iter__(self) -> Self:
         return self
 
     def __next__(self) -> T:
@@ -320,6 +323,15 @@ class SkipIterator[T: (int, float)]:
         self.index += self.n
         return value
 ```
+
+Если хочешь, этот же метод можно аннотировать и по-старому:
+
+```python
+def __iter__(self) -> "SkipIterator[T]":
+    return self
+```
+
+Оба варианта рабочие, но `Self` обычно читается лучше, когда метод возвращает сам текущий объект.
 
 Что здесь важно:
 
