@@ -1,68 +1,99 @@
 ---
-tags:
-  - python
-  - строки
-  - t-strings
-  - template
-  - python-3.14
-  - памятка
-уровень: продвинутое
+tags: [python, строки, t-strings, python-3.14]
+difficulty: advanced
 ---
 
-# 🔐 Памятка: T-строки (Template strings) в Python 3.14
+# 🔐 T-строки (Template strings) — памятка
 
-## 🎯 Суть в 30 секунд
+> T-строки (Python 3.14+) — способ форматирования строк, при котором значения хранятся **отдельно** от шаблона. В отличие от f-строк не подставляют значения сразу — вместо этого возвращают объект `Template`, который можно обработать безопасно. Основное применение — защита от SQL и HTML инъекций.
 
-**T-строки** — новый способ формирования строк в Python 3.14, который хранит значения отдельно от строки. Защищают от инъекций (SQL, HTML) в отличие от f-строк.
+## Содержание
 
-```python
-name = 'James'
-# F-строка (опасна для SQL)
-query = f"SELECT * WHERE name = {name}"
+- [[#Справка|Справка]]
+- [[#📊 Общая схема|Общая схема]]
+- [[#🟢 T-строка vs F-строка|T-строка vs F-строка]]
+- [[#🔵 Класс Template и его атрибуты|Класс Template и его атрибуты]]
+- [[#🔴 Класс Interpolation|Класс Interpolation]]
+- [[#🟡 Функция convert()|Функция convert()]]
+- [[#🟣 Получение итоговой строки|Получение итоговой строки]]
+- [[#🔐 Защита от SQL-инъекций|Защита от SQL-инъекций]]
+- [[#⚡ Быстрые примеры|Быстрые примеры]]
+- [[#💡 Практические замечания|Практические замечания]]
+- [[#⚠️ Частые ошибки|Частые ошибки]]
 
-# T-строка (безопаснее, значения отдельно)
-template = t"SELECT * WHERE name = {name}"
+---
+
+## Справка
+
+| Элемент | Что это | Пример |
+|---|---|---|
+| `t"..."` | T-строка — возвращает `Template` | `t"Hello {name}"` |
+| `Template` | Объект с атрибутами strings, interpolations, values | `result.strings` |
+| `Interpolation` | Один заполнитель `{expr!conv:fmt}` | `interp.value` |
+| `convert()` | Применяет флаг `!s`, `!r`, `!a` к значению | `convert(val, 'r')` |
+| `strings` | Кортеж подстрок между заполнителями | `('Hello ', '')` |
+| `interpolations` | Кортеж объектов Interpolation | `(Interpolation(...),)` |
+| `values` | Кортеж вычисленных значений | `('Alice',)` |
+
+---
+
+## 📊 Общая схема
+
+```
+t"Hello {name!r:>10}, age {age:03d}"
+         │                  │
+         │                  └── Interpolation 2
+         │                       .value      = 25
+         │                       .expression = 'age'
+         │                       .format_spec = '03d'
+         │                       .conversion  = None
+         │
+         └── Interpolation 1
+              .value      = 'Alice'
+              .expression = 'name'
+              .format_spec = '>10'
+              .conversion  = 'r'
+
+Template.strings         = ('Hello ', ', age ', '')
+Template.interpolations  = (Interpolation1, Interpolation2)
+Template.values          = ('Alice', 25)
+
+Порядок при итерации:
+strings[0] → interpolations[0] → strings[1] → interpolations[1] → strings[2]
+"Hello "      name                ", age "      age                ""
 ```
 
 ---
 
-## 📌 Часть 1: Основы T-строк
+## 🟢 T-строка vs F-строка
 
-### 🚀 T-строка vs F-строка
-
-| Параметр | **F-строка** | **T-строка** |
-|----------|-----------|-----------|
-| **Префикс** | `f"..."` или `f'...'` | `t"..."` или `t'...'` |
-| **Выполнение** | Подставляет значения сразу | Хранит значения отдельно |
-| **Тип** | `str` | `Template` (объект) |
-| **Безопасность** | Опасна для SQL/HTML | Защищает от инъекций |
-| **Использование** | Вывод, логирование | Динамический код (SQL, HTML) |
-
-### 💻 Пример различия
+| Параметр | f-строка | T-строка |
+|---|---|---|
+| Префикс | `f"..."` | `t"..."` |
+| Результат | `str` — готовая строка | `Template` — объект |
+| Подстановка | Сразу при создании | Отложена — ты контролируешь |
+| Безопасность | Опасна для SQL/HTML | Защищает от инъекций |
+| Применение | Вывод, логирование | SQL, HTML, шаблоны |
+| Python | 3.6+ | 3.14+ |
 
 ```python
-from string.templatelib import Template
-
 name = 'James'
 surname = 'Bond'
 
-# F-строка — сразу подставляет
+# F-строка — сразу подставляет, возвращает str
 f_result = f'My name is {surname}, {name.upper()} {surname.upper()}'
-print(f_result)  # My name is Bond, JAMES BOND (обычная строка)
+print(type(f_result))   # <class 'str'>
+print(f_result)         # My name is Bond, JAMES BOND
 
-# T-строка — хранит отдельно
+# T-строка — хранит отдельно, возвращает Template
 t_result = t'My name is {surname}, {name.upper()} {surname.upper()}'
-print(t_result)
-# Template(strings=(...), interpolations=(...))
+print(type(t_result))   # <class 'string.templatelib.Template'>
+print(t_result)         # Template(strings=(...), interpolations=(...))
 ```
 
 ---
 
-## 📌 Часть 2: Структура T-строки
-
-### 🏗️ Класс Template
-
-T-строка — это объект класса `Template`, имеющий атрибуты:
+## 🔵 Класс Template и его атрибуты
 
 ```python
 from string.templatelib import Template
@@ -71,174 +102,104 @@ name = 'James'
 surname = 'Bond'
 result = t'My name is {surname}, {name.upper()} {surname.upper()}'
 
-# Атрибут strings — подстроки между заполнителями
+# strings — подстроки между заполнителями
 print(result.strings)
 # ('My name is ', ', ', ' ', '')
 
-# Атрибут interpolations — заполнители (объекты Interpolation)
+# interpolations — объекты Interpolation
 print(result.interpolations)
 # (Interpolation(...), Interpolation(...), Interpolation(...))
 
-# Атрибут values — значения выражений (без format и conversion)
+# values — вычисленные значения (без format и conversion)
 print(result.values)
 # ('Bond', 'JAMES', 'BOND')
 ```
 
-### 📊 Порядок элементов
+**Правило чередования:** элементы при итерации всегда идут как `str → Interpolation → str → Interpolation → ... → str`. Строк всегда на одну больше чем заполнителей.
 
 ```
-Строка:          My name is {surname}, {name.upper()} {surname.upper()}
-                 ^            ^       ^              ^                 ^
-
-strings[0]       strings[1]   strings[2]             strings[3]
-"My name is "    ", "         " "                    ""
-
-               interpolations[0]  interpolations[1]  interpolations[2]
-               surname             name.upper()     surname.upper()
+"My name is {surname}, {name.upper()} {surname.upper()}"
+ strings[0]  interp[0]  strings[1]  interp[1]  strings[2]  interp[2]  strings[3]
+"My name is"  surname    ", "       name.upper()  " "      surname.upper()  ""
 ```
-
-**Правило:** Элементы Template чередуются: строка → заполнитель → строка → заполнитель → ... → строка
 
 ---
 
-## 📌 Часть 3: Класс Interpolation
+## 🔴 Класс Interpolation
 
-### 🎯 Атрибуты Interpolation
+Каждый заполнитель `{выражение!conversion:format_spec}` — это объект `Interpolation` с четырьмя атрибутами:
 
 ```python
-from string.templatelib import Template
-
-name = 'James'
-surname = 'Bond'
-result = t'My name is {surname!s:<15}, {name.upper()!r} {surname.upper():!^10}'
+result = t'My name is {surname!s:<15}, {name.upper()!r}'
 
 for interp in result.interpolations:
-    print(f"Значение:     {interp.value}")
-    print(f"Выражение:    {interp.expression}")
-    print(f"Format spec:  {interp.format_spec}")
-    print(f"Conversion:   {interp.conversion}")
+    print(f"value:       {interp.value}")       # вычисленное значение
+    print(f"expression:  {interp.expression}")  # исходный код выражения
+    print(f"format_spec: {interp.format_spec}") # спецификатор формата
+    print(f"conversion:  {interp.conversion}")  # флаг !s / !r / !a
     print()
 ```
 
-**Вывод:**
+Вывод:
 ```
-Значение:     Bond
-Выражение:    surname
-Format spec:  <15
-Conversion:   s
+value:       Bond
+expression:  surname
+format_spec: <15
+conversion:  s
 
-Значение:     JAMES
-Выражение:    name.upper()
-Format spec:  
-Conversion:   r
-
-Значение:     BOND
-Выражение:    surname.upper()
-Format spec:  !^10
-Conversion:   None
+value:       JAMES
+expression:  name.upper()
+format_spec:
+conversion:  r
 ```
 
-### 📋 Части Interpolation
+**Синтаксис заполнителя:**
 
 ```python
 {выражение!conversion:format_spec}
-       ↓        ↓           ↓
-   expression conversion  format_spec
 
-# Примеры
-{name}                    # expression='name', conversion=None, format_spec=''
-{name!s}                  # conversion='s'
-{name:>10}                # format_spec='>10'
-{name!r:^20}              # conversion='r', format_spec='^20'
+{name}          # expression='name', conversion=None, format_spec=''
+{name!s}        # conversion='s'
+{name:>10}      # format_spec='>10'
+{name!r:^20}    # conversion='r', format_spec='^20'
 ```
 
 ---
 
-## 📌 Часть 4: Функция convert()
+## 🟡 Функция convert()
 
-### 🔧 Что это?
-
-`convert()` — применяет флаг преобразования к объекту.
+`convert(value, flag)` — применяет флаг преобразования к значению:
 
 ```python
 from string.templatelib import convert
 
-text = 'beegeek'
+text = 'hello'
 
-# None — без изменений
-print(convert(text, None))   # beegeek
-
-# 's' — str()
-print(convert(text, 's'))    # beegeek
-
-# 'r' — repr()
-print(convert(text, 'r'))    # 'beegeek'
-
-# 'a' — ascii()
-print(convert(text, 'a'))    # 'beegeek'
+convert(text, None)   # → 'hello'     без изменений
+convert(text, 's')    # → 'hello'     str()
+convert(text, 'r')    # → "'hello'"   repr() — с кавычками
+convert(text, 'a')    # → "'hello'"   ascii()
 ```
 
-### 📊 Флаги преобразования
-
-| Флаг | Функция | Результат |
-|------|---------|-----------|
-| `None` | Без изменений | Объект как есть |
-| `'s'` | `str()` | Строковое представление |
-| `'r'` | `repr()` | Представление для разработчика |
-| `'a'` | `ascii()` | ASCII-представление |
+| Флаг | Функция | Когда использовать |
+|---|---|---|
+| `None` | без изменений | по умолчанию |
+| `'s'` | `str()` | явное преобразование в строку |
+| `'r'` | `repr()` | отладка, отображение с кавычками |
+| `'a'` | `ascii()` | только ASCII символы |
 
 ---
 
-## 📌 Часть 5: Получение итоговой строки
+## 🟣 Получение итоговой строки
 
-### 🔄 Алгоритм обработки
-
-```python
-from string.templatelib import convert, Interpolation
-
-name = 'James'
-surname = 'Bond'
-result = t'My name is {surname!s:<15}, {name.upper()!r} {surname.upper():!^10}'
-
-final_parts = []
-
-# 1. Итерируемся по элементам шаблона
-for part in result:
-    # 2. Если это строка — добавляем как есть
-    if isinstance(part, str):
-        final_parts.append(part)
-    
-    # 3. Если это заполнитель — обрабатываем
-    else:
-        # Получаем компоненты
-        conversion = part.conversion
-        format_spec = part.format_spec
-        value = part.value
-        
-        # Применяем format()
-        formatted_value = format(value, format_spec)
-        
-        # Применяем convert()
-        converted_value = convert(formatted_value, conversion)
-        
-        # Добавляем в результат
-        final_parts.append(converted_value)
-
-# 4. Объединяем все части в одну строку
-final_string = ''.join(final_parts)
-print(final_string)
-# My name is Bond       , 'JAMES' !!!BOND!!!
-```
-
-### 💻 Функция для обработки T-строки
+T-строка не подставляет значения сама — ты делаешь это вручную через итерацию:
 
 ```python
-from string.templatelib import convert, Interpolation
+from string.templatelib import convert
 
 def process_template(template):
     """Преобразует t-строку в обычную строку"""
     parts = []
-    
     for element in template:
         if isinstance(element, str):
             parts.append(element)
@@ -246,7 +207,6 @@ def process_template(template):
             value = format(element.value, element.format_spec)
             value = convert(value, element.conversion)
             parts.append(value)
-    
     return ''.join(parts)
 
 # Использование
@@ -254,17 +214,29 @@ name = 'James'
 surname = 'Bond'
 template = t'My name is {surname}, {name.upper()}'
 print(process_template(template))
-# My name is Bond, JAMES
+# → My name is Bond, JAMES
+```
+
+**Компактная версия:**
+
+```python
+from string.templatelib import convert, Interpolation
+
+result = ''.join(
+    e if isinstance(e, str)
+    else convert(format(e.value, e.format_spec), e.conversion)
+    for e in template
+)
 ```
 
 ---
 
-## 📌 Часть 6: Защита от SQL-инъекций
+## 🔐 Защита от SQL-инъекций
 
-### 🔐 Проблема с F-строками
+**Проблема с f-строками:**
 
 ```python
-# ❌ ОПАСНО! F-строка уязвима
+# ❌ F-строка уязвима
 artist = "' OR '1'='1"
 query = f"SELECT * FROM Songs WHERE artist = '{artist}'"
 print(query)
@@ -272,261 +244,128 @@ print(query)
 # ← SQL инъекция! Вернёт ВСЕ записи!
 ```
 
-### ✅ Решение с T-строками
+**Решение с T-строками:**
 
 ```python
 def clean_sql(template):
-    """Очищает t-строку от опасного кода, заменяя значения на ?"""
+    """Заменяет заполнители на ? — безопасный плейсхолдер"""
     parts = []
-    
     for element in template:
         if isinstance(element, str):
             parts.append(element)
         else:
-            # Заменяем значение на ? (безопасный плейсхолдер)
             parts.append('?')
-    
-    return ''.join(parts)
+    return ''.join(parts), template.values
 
-# Использование
 artist = "' OR '1'='1"
 template = t"SELECT * FROM Songs WHERE artist = '{artist}'"
 
-# Очищенный запрос
-safe_query = clean_sql(template)
-print(safe_query)
-# SELECT * FROM Songs WHERE artist = ?
-
-# Теперь безопасно подставляем значение
-# Значение хранится в template.values[0]
-values = template.values
+query, values = clean_sql(template)
+print(query)   # SELECT * FROM Songs WHERE artist = ?
 print(values)  # ("' OR '1'='1",)
-```
 
-### 🔄 Полная схема безопасного SQL
-
-```python
-from string.templatelib import convert
-
-def safe_sql_query(template, execute_func):
-    """Формирует безопасный SQL-запрос и выполняет его"""
-    # 1. Очищаем шаблон
-    parts = []
-    for element in template:
-        if isinstance(element, str):
-            parts.append(element)
-        else:
-            parts.append('?')
-    
-    query = ''.join(parts)
-    
-    # 2. Получаем значения заполнителей
-    values = template.values
-    
-    # 3. Выполняем с параметризованным запросом
-    return execute_func(query, values)
-
-# Использование
-# artist = user_input  # Опасный ввод от пользователя
-# template = t"SELECT * FROM Songs WHERE artist = '{artist}'"
-# result = safe_sql_query(template, db.execute)
+# Теперь безопасно передаём в БД:
+# db.execute(query, values)
 ```
 
 ---
 
-## 📌 Часть 7: Конкатенация T-строк
-
-### ✅ T-строка + T-строка
+## ⚡ Быстрые примеры
 
 ```python
-name = 'James'
-surname = 'Bond'
+from string.templatelib import convert, Interpolation
 
-result1 = t'My name is {surname}, '
-result2 = t'{name.upper()} {surname.upper()}'
+name = 'Alice'
+age = 25
 
-combined = result1 + result2  # ✅ Работает!
-print(combined)
-# Template(strings=(...), interpolations=(...))
-```
+# Создание
+t = t"Hello {name}, age {age}"
 
-### ❌ T-строка + F-строка
+# Атрибуты
+t.strings         # ('Hello ', ', age ', '')
+t.values          # ('Alice', 25)
+t.interpolations  # (Interpolation(...), Interpolation(...))
 
-```python
-result1 = t'My name is {surname}, '
-result2 = f'{name.upper()} {surname.upper()}'  # f-строка (тип str)
+# Итерация
+for part in t:
+    print(type(part).__name__, repr(part) if isinstance(part, str) else part.value)
 
-combined = result1 + result2  # ❌ TypeError!
-# TypeError: can only concatenate Template (not "str") to Template
-```
+# Конкатенация T + T
+t1 = t'Hello {name}, '
+t2 = t'age {age}'
+combined = t1 + t2          # ✅ Template
 
-**Правило:** T-строки можно объединять между собой, но не с обычными строками.
+# Конкатенация T + str
+combined = t1 + f'age {age}'  # ❌ TypeError
 
----
-
-## 🔥 Частые ошибки
-
-### ❌ Ошибка 1: Забыть применить format() и convert()
-
-```python
-# ❌ НЕПРАВИЛЬНО
-result = t'{value:>10!s}'
-for part in result.interpolations:
-    print(part.value)  # Выведет БЕЗ форматирования!
-
-# ✅ ПРАВИЛЬНО
-for part in result.interpolations:
-    formatted = format(part.value, part.format_spec)
-    converted = convert(formatted, part.conversion)
-    print(converted)  # С форматированием
-```
-
-### ❌ Ошибка 2: Смешивать T-строки с F-строками
-
-```python
-# ❌ НЕПРАВИЛЬНО
-t_str = t'Hello {name}'
-f_str = f'World {name}'
-result = t_str + f_str  # TypeError!
-
-# ✅ ПРАВИЛЬНО
-result = t_str + t'World {name}'
-```
-
-### ❌ Ошибка 3: Неправильный флаг conversion
-
-```python
-from string.templatelib import convert
-
-text = 'beegeek'
-convert(text, 'x')  # ❌ ValueError: invalid conversion specifier: x
-
-# ✅ Используй только: None, 's', 'r', 'a'
-convert(text, 's')  # ✅ OK
-```
-
-### ❌ Ошибка 4: Не учитывать порядок элементов
-
-```python
-result = t'Hello {name}, you are {age} years old'
-
-# ❌ НЕПРАВИЛЬНЫЙ ПОРЯДОК
-print(result.interpolations)  # (name, age)
-print(result.strings)         # ('Hello ', ', you are ', ' years old')
-
-# ✅ ПРАВИЛЬНЫЙ ПОРЯДОК (чередующийся)
-# strings[0] + interpolations[0] + strings[1] + interpolations[1] + strings[2]
+# SQL защита
+def safe_sql(tmpl):
+    return ''.join('?' if isinstance(e, Interpolation) else e for e in tmpl)
 ```
 
 ---
 
-## 💎 Лучшие практики
+## 💡 Практические замечания
 
-### ✅ DO
+- T-строки доступны только в Python 3.14+
+- Используй T-строки только когда нужна защита от инъекций — для обычного вывода f-строки лучше
+- `template.values` — значения без `format()` и `convert()`, только сырые результаты выражений
+- При конкатенации можно объединять только T-строки между собой
+- Всегда применяй `format()` перед `convert()`, не наоборот
 
+---
+
+## ⚠️ Частые ошибки
+
+**❌ Забыл применить format() и convert():**
 ```python
-from string.templatelib import convert
-
-# 1. Используй функцию-обработчик
-def process_template(template):
-    parts = []
-    for element in template:
-        if isinstance(element, str):
-            parts.append(element)
-        else:
-            value = format(element.value, element.format_spec)
-            value = convert(value, element.conversion)
-            parts.append(value)
-    return ''.join(parts)
-
-# 2. Для SQL используй параметризованные запросы
-def safe_query(template):
-    query_parts = []
-    for element in template:
-        if isinstance(element, str):
-            query_parts.append(element)
-        else:
-            query_parts.append('?')
-    return ''.join(query_parts), template.values
-
-# 3. Проверяй тип перед обработкой
-from string.templatelib import Interpolation
-for element in template:
-    if isinstance(element, Interpolation):
-        # Обрабатываем заполнитель
-        pass
-```
-
-### ❌ DON'T
-
-```python
-# 1. Не пропускай format() и convert()
 for interp in template.interpolations:
-    print(interp.value)  # ❌ Без форматирования
+    print(interp.value)              # ❌ без форматирования
 
-# 2. Не объединяй t-строки с f-строками
-result = t'...' + f'...'  # ❌ TypeError
-
-# 3. Не используй для простых строк
-# Используй f-строки, если не нужна защита от инъекций
-text = f'Hello {name}'  # ✅ Правильнее, чем t'Hello {name}'
-
-# 4. Не забывай про порядок элементов
-# strings и interpolations чередуются!
+for interp in template.interpolations:
+    v = format(interp.value, interp.format_spec)
+    v = convert(v, interp.conversion)
+    print(v)                         # ✅
 ```
+
+**❌ Смешал T-строку с f-строкой или str:**
+```python
+t'Hello {name}' + f'World {name}'   # ❌ TypeError
+t'Hello {name}' + t'World {name}'   # ✅
+```
+
+**❌ Неправильный флаг conversion:**
+```python
+convert(text, 'x')   # ❌ ValueError — нет такого флага
+convert(text, 'r')   # ✅ только None, 's', 'r', 'a'
+```
+
+**❌ Перепутал порядок format() и convert():**
+```python
+convert(format(value, fmt), conv)   # ✅ сначала format, потом convert
+format(convert(value, conv), fmt)   # ❌ convert применяется к уже отформатированному
+```
+
+---
+
+## ✅ Главные правила
+
+✅ T-строка возвращает `Template`, а не `str` — значения не подставляются сразу  
+✅ Элементы Template чередуются: `str → Interpolation → str → ...`  
+✅ `Interpolation` имеет четыре атрибута: `value`, `expression`, `format_spec`, `conversion`  
+✅ Всегда применяй `format()` перед `convert()`  
+✅ T-строки можно объединять только с T-строками, не со `str`  
+✅ Для простого вывода используй f-строки — T-строки только для защиты от инъекций  
+✅ `clean_sql()` — типичный паттерн: заменяй заполнители на `?`, передавай значения отдельно  
 
 ---
 
 ## 🔗 Связанные темы
 
-- [[05 — F-строки]]
-- [[20 — Форматирование строк]]
-- [[25 — Работа с базами данных (SQL)]]
+- [[00 — 📊 Обзор и сравнение способов]]
+- [[03 — ✨ f-строки]]
+- [[04 — 🎯 Спецификатор формата]]
 
 ---
 
-## ✅ Шпаргалка
-
-```python
-from string.templatelib import convert, Interpolation
-
-# Создание t-строки
-template = t'Hello {name!s:>10}, age {age:03d}'
-
-# Доступ к компонентам
-print(template.strings)         # Подстроки
-print(template.interpolations)  # Заполнители
-print(template.values)          # Значения выражений
-
-# Итерирование
-for element in template:
-    if isinstance(element, str):
-        # Обычная строка
-        pass
-    else:
-        # Interpolation объект
-        value = element.value
-        expr = element.expression
-        fmt = element.format_spec
-        conv = element.conversion
-
-# Форматирование и преобразование
-formatted = format(value, format_spec)
-converted = convert(formatted, conversion)
-
-# Получение итоговой строки
-result = ''.join([
-    (e if isinstance(e, str) else 
-     convert(format(e.value, e.format_spec), e.conversion))
-    for e in template
-])
-
-# Конкатенация
-template1 = t'Hello {name}, '
-template2 = t'age {age}'
-combined = template1 + template2  # ✅ Template + Template
-
-# SQL защита
-def clean_sql(tmpl):
-    return ''.join('?' if isinstance(e, Interpolation) else e for e in tmpl)
-```
+#python/строки #форматирование #t-strings #python-3.14
