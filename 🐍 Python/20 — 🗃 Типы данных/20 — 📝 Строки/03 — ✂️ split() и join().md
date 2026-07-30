@@ -11,15 +11,16 @@ difficulty: beginner
 
 - [[#Справка|Справка]]
 - [[#📊 Общая схема|Общая схема]]
-- [[#🟢 split() — базовый синтаксис|split() — базовый синтаксис]]
-- [[#🔵 split() vs rsplit()|split() vs rsplit()]]
-- [[#🔴 splitlines()|splitlines()]]
-- [[#🟡 join() — склейка списка|join() — склейка списка]]
-- [[#🔧 split() изнутри — алгоритм|split() изнутри]]
+- [[#✂️ split() — базовый синтаксис|split() — базовый синтаксис]]
+- [[#↩️ split() vs rsplit()|split() vs rsplit()]]
+- [[#📄 splitlines()|splitlines()]]
+- [[#🔗 join() — склейка списка|join() — склейка списка]]
+- [[#🔧 split() изнутри — алгоритм|split() изнутри — алгоритм]]
 - [[#⚙️ re.split() — разбивка по паттерну|re.split()]]
 - [[#⚡ Быстрые примеры|Быстрые примеры]]
 - [[#💡 Практические замечания|Практические замечания]]
 - [[#⚠️ Частые ошибки|Частые ошибки]]
+- [[#✅ Главные правила|Главные правила]]
 
 ---
 
@@ -56,7 +57,7 @@ split()                          join()
 
 ---
 
-## 🟢 split() — базовый синтаксис
+## ✂️ split() — базовый синтаксис
 
 ```python
 str.split(sep=None, maxsplit=-1)
@@ -94,7 +95,7 @@ str.split(sep=None, maxsplit=-1)
 
 ---
 
-## 🔵 split() vs rsplit()
+## ↩️ split() vs rsplit()
 
 `rsplit()` — то же самое что `split()`, но разбивает **справа налево**. Разница видна только при `maxsplit`:
 
@@ -117,7 +118,7 @@ str.split(sep=None, maxsplit=-1)
 
 ---
 
-## 🔴 splitlines()
+## 📄 splitlines()
 
 Разбивает строку по символам переноса строки:
 
@@ -139,7 +140,7 @@ str.splitlines(keepends=False)
 
 ---
 
-## 🟡 join() — склейка списка
+## 🔗 join() — склейка списка
 
 ```python
 sep.join(iterable)
@@ -198,18 +199,24 @@ sep.join(iterable)
 def split_whitespace(s):
     result = []
     i, n = 0, len(s)
+
     while i < n:
-        while i < n and s[i].isspace():  # пропускаем пробелы
+        while i < n and s[i].isspace():  # Шаг 1: пропускаем пробелы
             i += 1
         if i >= n:
             break
-        start = i
-        while i < n and not s[i].isspace():  # копим слово
+        start = i                         # Шаг 2: начало слова
+        while i < n and not s[i].isspace():  # Шаг 3: копим слово
             i += 1
-        result.append(s[start:i])
+        word = s[start:i]                 # Шаг 4: сохраняем слово
+        result.append(word)
+
     return result
+
 # Пустые строки не возникают — слова начинаются только после пробелов
 ```
+
+&nbsp;
 
 **`split(sep)` с аргументом — режет по разделителю:**
 
@@ -229,14 +236,16 @@ def split_whitespace(s):
 def split_with_sep(s, sep):
     result = []
     i, n, sep_len = 0, len(s), len(sep)
+
     while True:
-        j = s.find(sep, i)       # ищем разделитель
+        j = s.find(sep, i)        # ищем разделитель
         if j < 0:
             j = n
-        result.append(s[i:j])   # берём часть (даже пустую!)
+        result.append(s[i:j])    # берём часть (даже пустую!)
         if j == n:
             break
-        i = j + sep_len          # перепрыгиваем через разделитель
+        i = j + sep_len           # перепрыгиваем через разделитель
+
     return result
 ```
 
