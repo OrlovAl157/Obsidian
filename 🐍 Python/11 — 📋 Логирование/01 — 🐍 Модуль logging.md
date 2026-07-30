@@ -18,6 +18,7 @@ difficulty: beginner
 - [[#📊 Уровни логирования|Уровни логирования]]
 - [[#🔀 Метод setLevel()|setLevel()]]
 - [[#0️⃣ Константа NOTSET|NOTSET]]
+- [[#🔴 Логирование исключений — exc_info|Логирование исключений]]
 - [[#📝 Примечания|Примечания]]
 
 ---
@@ -510,6 +511,100 @@ logger = logging.getLogger(__name__)
 
 logger.debug('DEBUG')  # ✅ работает
 ```
+
+---
+
+## 🔴 Логирование исключений — exc_info
+
+**Проблема:** обычный `logger.error()` не показывает traceback исключения.
+
+```python
+try:
+    raise ValueError('Ошибка')
+except ValueError:
+    logger.error('Произошла ошибка')  # ← только текст, без traceback
+```
+
+Вывод:
+```
+ERROR:__main__:Произошла ошибка
+```
+
+**Решение — параметр `exc_info`:**
+
+### Вариант 1: exc_info=True
+
+```python
+import logging
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+
+try:
+    raise ValueError('Ошибка')
+except ValueError:
+    logger.error('Произошла ошибка', exc_info=True)  # ← добавляет traceback
+```
+
+Вывод:
+```
+ERROR:__main__:Произошла ошибка
+Traceback (most recent call last):
+  File "main.py", line 8, in <module>
+    raise ValueError('Ошибка')
+ValueError: Ошибка
+```
+
+### Вариант 2: exc_info=exc (объект исключения)
+
+```python
+try:
+    raise ValueError('Ошибка')
+except ValueError as exc:
+    logger.error('Произошла ошибка', exc_info=exc)   # ← тот же результат
+```
+
+Результат идентичен `exc_info=True`.
+
+### Вариант 3: exception() — самый удобный
+
+`exception()` — это просто `error()` с `exc_info=True` внутри:
+
+```python
+try:
+    raise ValueError('Ошибка')
+except ValueError:
+    logger.exception('Произошла ошибка')  # ← эквивалентно error(..., exc_info=True)
+```
+
+Так же можно передать объект исключения:
+
+```python
+except ValueError as exc:
+    logger.exception('Произошла ошибка', exc_info=exc)
+```
+
+### exc_info доступен всем методам
+
+`exc_info` — не только у `error()`. Работает с любым методом логирования:
+
+```python
+logger.debug('Отладка с traceback', exc_info=True)
+logger.info('Инфо с traceback', exc_info=True)
+logger.warning('Предупреждение с traceback', exc_info=True)
+logger.error('Ошибка с traceback', exc_info=True)
+logger.critical('Критично с traceback', exc_info=True)
+```
+
+### Сравнение вариантов
+
+| Способ | Уровень | exc_info | Когда использовать |
+|---|---|---|---|
+| `logger.error(..., exc_info=True)` | ERROR | явно `True` | когда нужен другой уровень |
+| `logger.error(..., exc_info=exc)` | ERROR | объект exc | когда exc уже есть в переменной |
+| `logger.exception(...)` | ERROR | автоматически | самый удобный вариант |
+
+**Важно:** `exception()` всегда пишет с уровнем ERROR. Если нужен другой уровень — используй `logger.warning(..., exc_info=True)`.
 
 ---
 
