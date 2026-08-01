@@ -499,3 +499,7 @@ UNION
 SELECT * FROM Users u
 RIGHT JOIN Orders o ON u.id = o.user_id;
 ```
+
+
+## 🔗 Полезные ссылки
+https://antonz.ru/sql-join/
