@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL JOIN — шпаргалка</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f8f6; color: #1a1a18; padding: 24px; }
+  h1 { font-size: 22px; font-weight: 500; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: #5f5e5a; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 720px; }
+  .card { background: #ffffff; border: 0.5px solid #d3d1c7; border-radius: 12px; padding: 14px 16px; }
+  .card-title { font-size: 14px; font-weight: 500; color: #1a1a18; margin-bottom: 6px; }
+  .card-desc { font-size: 12px; color: #5f5e5a; margin-bottom: 10px; line-height: 1.5; }
+  .venn { display: flex; align-items: center; justify-content: center; margin-bottom: 10px; height: 64px; }
+  .code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 11px; background: #f1efe8; border: 0.5px solid #d3d1c7; border-radius: 6px; padding: 8px 10px; color: #1a1a18; line-height: 1.6; white-space: pre; }
+  .kw { color: #185FA5; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<h1>SQL JOIN — шпаргалка</h1>
+<p class="subtitle">Как объединяются таблицы A (левая) и B (правая)</p>
+
+<div class="grid">
+
+  <div class="card">
+    <div class="venn">
+      <svg width="100" height="56" viewBox="0 0 100 56">
+        <circle cx="34" cy="28" r="22" fill="#B5D4F4" opacity="0.7"/>
+        <circle cx="66" cy="28" r="22" fill="#B5D4F4" opacity="0.7"/>
+        <circle cx="34" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <circle cx="66" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <text x="24" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">A</text>
+        <text x="68" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">B</text>
+      </svg>
+    </div>
+    <div class="card-title">INNER JOIN</div>
+    <div class="card-desc">Только строки с совпадением в обеих таблицах</div>
+    <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> A
+<span class="kw">INNER JOIN</span> B <span class="kw">ON</span> A.id = B.id;</div>
+  </div>
+
+  <div class="card">
+    <div class="venn">
+      <svg width="100" height="56" viewBox="0 0 100 56">
+        <circle cx="34" cy="28" r="22" fill="#B5D4F4" opacity="0.9"/>
+        <circle cx="66" cy="28" r="22" fill="#B5D4F4" opacity="0.4"/>
+        <circle cx="34" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <circle cx="66" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <text x="24" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">A</text>
+        <text x="68" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">B</text>
+      </svg>
+    </div>
+    <div class="card-title">LEFT JOIN</div>
+    <div class="card-desc">Все строки из A + совпадения из B. Нет совпадения — NULL</div>
+    <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> A
+<span class="kw">LEFT JOIN</span> B <span class="kw">ON</span> A.id = B.id;</div>
+  </div>
+
+  <div class="card">
+    <div class="venn">
+      <svg width="100" height="56" viewBox="0 0 100 56">
+        <circle cx="34" cy="28" r="22" fill="#B5D4F4" opacity="0.4"/>
+        <circle cx="66" cy="28" r="22" fill="#B5D4F4" opacity="0.9"/>
+        <circle cx="34" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <circle cx="66" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <text x="24" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">A</text>
+        <text x="68" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">B</text>
+      </svg>
+    </div>
+    <div class="card-title">RIGHT JOIN</div>
+    <div class="card-desc">Все строки из B + совпадения из A. Нет совпадения — NULL</div>
+    <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> A
+<span class="kw">RIGHT JOIN</span> B <span class="kw">ON</span> A.id = B.id;</div>
+  </div>
+
+  <div class="card">
+    <div class="venn">
+      <svg width="100" height="56" viewBox="0 0 100 56">
+        <circle cx="34" cy="28" r="22" fill="#B5D4F4" opacity="0.9"/>
+        <circle cx="66" cy="28" r="22" fill="#B5D4F4" opacity="0.9"/>
+        <circle cx="34" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <circle cx="66" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <text x="24" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">A</text>
+        <text x="68" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">B</text>
+      </svg>
+    </div>
+    <div class="card-title">FULL OUTER JOIN</div>
+    <div class="card-desc">Все строки из A и B. Нет совпадения — NULL с обеих сторон</div>
+    <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> A <span class="kw">LEFT JOIN</span> B ...
+<span class="kw">UNION</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> A <span class="kw">RIGHT JOIN</span> B ...;</div>
+  </div>
+
+  <div class="card">
+    <div class="venn">
+      <svg width="100" height="56" viewBox="0 0 100 56">
+        <circle cx="34" cy="28" r="22" fill="#B5D4F4" opacity="0.9"/>
+        <clipPath id="excl-left">
+          <rect x="0" y="0" width="44" height="56"/>
+        </clipPath>
+        <circle cx="66" cy="28" r="22" fill="#f8f8f6" clip-path="url(#excl-left)"/>
+        <circle cx="34" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <circle cx="66" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <text x="24" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">A</text>
+        <text x="68" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">B</text>
+      </svg>
+    </div>
+    <div class="card-title">LEFT EXCLUDING JOIN</div>
+    <div class="card-desc">Только строки из A которых нет в B</div>
+    <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> A
+<span class="kw">LEFT JOIN</span> B <span class="kw">ON</span> A.id = B.id
+<span class="kw">WHERE</span> B.id <span class="kw">IS NULL</span>;</div>
+  </div>
+
+  <div class="card">
+    <div class="venn">
+      <svg width="100" height="56" viewBox="0 0 100 56">
+        <circle cx="66" cy="28" r="22" fill="#B5D4F4" opacity="0.9"/>
+        <clipPath id="excl-right">
+          <rect x="56" y="0" width="44" height="56"/>
+        </clipPath>
+        <circle cx="34" cy="28" r="22" fill="#f8f8f6" clip-path="url(#excl-right)"/>
+        <circle cx="34" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <circle cx="66" cy="28" r="22" fill="none" stroke="#185FA5" stroke-width="1.5"/>
+        <text x="24" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">A</text>
+        <text x="68" y="31" font-size="10" fill="#0C447C" font-family="sans-serif" font-weight="500">B</text>
+      </svg>
+    </div>
+    <div class="card-title">RIGHT EXCLUDING JOIN</div>
+    <div class="card-desc">Только строки из B которых нет в A</div>
+    <div class="code"><span class="kw">SELECT</span> * <span class="kw">FROM</span> A
+<span class="kw">RIGHT JOIN</span> B <span class="kw">ON</span> A.id = B.id
+<span class="kw">WHERE</span> A.id <span class="kw">IS NULL</span>;</div>
+  </div>
+
+</div>
+</body>
+</html>
