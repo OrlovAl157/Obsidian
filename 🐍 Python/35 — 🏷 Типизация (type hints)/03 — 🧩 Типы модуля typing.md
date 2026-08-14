@@ -184,10 +184,9 @@ type NumberOrStr = int | float | str
 
 Когда структура данных вложена в саму себя — псевдоним типа должен ссылаться на себя.
 
-**Пример: список чисел произвольной глубины вложенности**
+**Python 3.9+ — через `TypeAlias` и строковую forward reference:**
 
 ```python
-# Python 3.9+ со строковой forward reference
 from typing import TypeAlias, Union
 
 NestedIntList: TypeAlias = list[Union[int, "NestedIntList"]]
@@ -196,18 +195,18 @@ def linear(nested_lists: NestedIntList) -> list[int]:
     ...
 ```
 
+Кавычки `"NestedIntList"` нужны потому что тип ещё не определён до конца строки.
+
+**Python 3.12+ — через синтаксис `type`:**
+
 ```python
-# Python 3.12+ — через новый синтаксис type
+# Фиксированный тип листьев
 type NestedIntList = list[int | NestedIntList]
 
 def linear(nested_lists: NestedIntList) -> list[int]:
     ...
-```
 
-**Когда листья могут быть произвольного типа — нужен TypeVar:**
-
-```python
-# Python 3.12+
+# Обобщённый — листья любого типа
 type NestedList[T] = list[T | NestedList[T]]
 
 def linear[T](nested_lists: NestedList[T]) -> list[T]:
@@ -217,31 +216,10 @@ linear(["a", ["b"]])       # → list[str] ✅
 linear([1, [2, [3]]])      # → list[int] ✅
 ```
 
-**Почему `T` важен здесь:**
-
-```python
-# ❌ Некорректная типизация — T объявлен, но семантически лишний
-def linear[T](nested_lists: list[T]) -> list[int]:
-    ...
-# Проблемы:
-# 1. list[T] — плоский список, рекурсивная структура не описана
-# 2. return не зависит от T — T бессмысленен
-
-# ✅ Корректно — вход и выход согласованы
-type NestedList[T] = list[T | NestedList[T]]
-
-def linear[T](nested_lists: NestedList[T]) -> list[T]:
-    ...
-```
-
-**Когда что использовать:**
-
 | Ситуация | Решение |
 |---|---|
-| Листья всегда `int` | `NestedIntList = list[int \| "NestedIntList"]` |
+| Листья всегда одного типа | `TypeAlias` + `"NestedIntList"` (< 3.12) или `type` (3.12+) |
 | Листья произвольного типа | `type NestedList[T] = list[T \| NestedList[T]]` |
-| Python < 3.12 | `TypeAlias` + строковая forward reference `"NestedIntList"` |
-| Python 3.12+ | синтаксис `type` — короче и нет кавычек |
 
 ---
 
