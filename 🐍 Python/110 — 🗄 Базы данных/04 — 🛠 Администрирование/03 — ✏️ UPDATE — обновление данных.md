@@ -438,7 +438,8 @@ UPDATE Books SET id = id + 1 ORDER BY id DESC;  -- ✅
 
 - [[02 — ➕ INSERT — добавление данных]]
 - [[04 — 🗑️ DELETE — удаление данных]]
-- [[01 — 🏗 CREATE ALTER DROP]]
+- [[01 — 🏗 CREATE TABLE — создание таблиц]]
+- [[01.1 — 🔧 ALTER, DROP, RENAME — изменение таблиц]]
 
 ---
 
