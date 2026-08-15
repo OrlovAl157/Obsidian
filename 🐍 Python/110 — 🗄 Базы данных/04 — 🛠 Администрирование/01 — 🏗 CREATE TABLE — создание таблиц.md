@@ -28,6 +28,7 @@ difficulty: intermediate
 | `DESCRIBE t` | показать структуру таблицы (поля, типы, ключи) |
 
 ---
+
 ## 🟢 CREATE TABLE — создание таблицы
 
 ```sql
