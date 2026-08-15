@@ -33,6 +33,7 @@ difficulty: intermediate
 | `ALTER TABLE t DROP COLUMN col` | удалить поле |
 | `ALTER TABLE t RENAME COLUMN col TO new_col` | переименовать поле |
 | `ALTER TABLE t MODIFY COLUMN col ...` | изменить тип/ограничения поля |
+| `ALTER TABLE t CHANGE COLUMN old new ...` | переименовать и переопределить поле за один раз |
 | `ALTER TABLE t ADD PRIMARY KEY (col)` | добавить первичный ключ |
 | `ALTER TABLE t ADD FOREIGN KEY ...` | добавить внешний ключ |
 | `ALTER TABLE t ADD CHECK (...)` | добавить CHECK |
@@ -208,6 +209,10 @@ RENAME COLUMN author TO writer;
 ALTER TABLE Books
 MODIFY COLUMN title VARCHAR(60) NOT NULL;
 
+-- Переименовать и переопределить одновременно (CHANGE)
+ALTER TABLE Books
+CHANGE COLUMN title name VARCHAR(60) CHECK (name != '');
+
 -- Установить значение по умолчанию
 ALTER TABLE Books
 ALTER COLUMN title SET DEFAULT 'Untitled';
@@ -216,6 +221,20 @@ ALTER COLUMN title SET DEFAULT 'Untitled';
 ALTER TABLE Books
 ALTER COLUMN title DROP DEFAULT;
 ```
+
+**MODIFY COLUMN полностью переопределяет поле, а не дополняет его.** Если у поля было, например, `DEFAULT`, а при `MODIFY` его не указать — оно потеряется, нужно прописывать заново. Исключение — `PRIMARY KEY` и `UNIQUE`: они сохраняются даже при переопределении поля.
+
+**Изменение типа может преобразовать данные.** Например, `FLOAT → INT` округлит значения до целых; уменьшение `VARCHAR(60)` до меньшего размера может дать ошибку, если существующие строки не помещаются.
+
+**Добавление NOT NULL-поля без DEFAULT в непустую таблицу** — СУБД сама подставит значение по умолчанию для типа (`0` для чисел, `''` для строк) всем существующим записям:
+
+```sql
+ALTER TABLE Books
+ADD COLUMN release_year INT NOT NULL;
+-- все существующие строки получат release_year = 0
+```
+
+Если же таблица пустая — автозначение не подставляется, поле просто создаётся.
 
 ### Работа с первичным ключом
 
@@ -228,6 +247,8 @@ ADD PRIMARY KEY (id);
 ALTER TABLE Books
 DROP PRIMARY KEY;
 ```
+
+Если у таблицы уже есть первичный ключ, повторный `ADD PRIMARY KEY` вызовет ошибку — сначала нужно выполнить `DROP PRIMARY KEY`, потом добавлять новый.
 
 ### Работа с внешним ключом
 
@@ -254,6 +275,8 @@ ALTER TABLE Books
 DROP FOREIGN KEY fk_publisher;
 ```
 
+Имя внешнего ключа — не то же самое, что имя поля. Если не задать его явно через `CONSTRAINT`, СУБД сгенерирует имя автоматически по шаблону `<таблица>_ibfk_<номер>` (например, `books_ibfk_1`) и хранит его отдельно от поля. Узнать это имя можно только через `SHOW CREATE TABLE`.
+
 ### Работа с CHECK
 
 ```sql
@@ -277,6 +300,15 @@ ALTER TABLE Books
 DROP CHECK books_chk_1,
 DROP CHECK books_chk_2;
 ```
+
+**Повторный `ADD CHECK` без имени — не ошибка, а новое отдельное ограничение.** Каждый вызов `ADD CHECK (title != '')` создаёт очередное ограничение (`books_chk_1`, `books_chk_2`, ...), даже если условие то же самое:
+
+```sql
+ALTER TABLE Books ADD CHECK (title != '');  -- создаст books_chk_1
+ALTER TABLE Books ADD CHECK (title != '');  -- создаст ещё и books_chk_2
+```
+
+А вот повторный `ADD CONSTRAINT` с тем же именем — уже настоящая ошибка `Duplicate check constraint name`. Именно поэтому именованные ограничения предпочтительнее: они не размножаются бесконтрольно и их проще узнать по осмысленному имени в тексте ошибки.
 
 ### Несколько изменений за один ALTER
 
