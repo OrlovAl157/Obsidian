@@ -37,6 +37,7 @@ difficulty: intermediate
 | `ALTER TABLE t ADD FOREIGN KEY ...` | добавить внешний ключ |
 | `ALTER TABLE t ADD CHECK (...)` | добавить CHECK |
 | `SHOW CREATE TABLE t` | показать SQL создания таблицы |
+| `DESCRIBE t` | показать структуру таблицы (поля, типы, ключи) |
 
 ---
 
@@ -75,6 +76,16 @@ CREATE TABLE Books (...);              -- ❌ ошибка если Books уже
 CREATE TABLE IF NOT EXISTS Books (...); -- ✅ просто пропустит если уже есть
 ```
 
+**Составной первичный ключ** — если ключом должны быть сразу несколько полей, `PRIMARY KEY` выносится в отдельное определение (в определении одного поля так писать нельзя):
+
+```sql
+CREATE TABLE Books (
+    title  VARCHAR(40),
+    author VARCHAR(40),
+    PRIMARY KEY (title, author)   -- уникальна пара значений, а не каждое поле по отдельности
+);
+```
+
 ---
 
 ## 🔵 Ограничения и ключевые слова
@@ -88,6 +99,19 @@ CREATE TABLE IF NOT EXISTS Books (...); -- ✅ просто пропустит �
 | `DEFAULT value` | значение по умолчанию |
 | `CHECK (expr)` | проверка условия при вставке/обновлении |
 | `FOREIGN KEY (col) REFERENCES t(col)` | внешний ключ — связь с другой таблицей |
+
+**DEFAULT — выражение может ссылаться на другие поля этой же записи** (только на те, что уже определены выше по списку):
+
+```sql
+CREATE TABLE Books (
+    title     VARCHAR(40),
+    author    VARCHAR(40),
+    fulltitle VARCHAR(40) DEFAULT (CONCAT(title, ' by ', author))
+);
+-- при вставке без fulltitle он соберётся сам: 'Fight Club by Chuck Palahniuk'
+```
+
+Если поле не имеет явного `DEFAULT`, но допускает `NULL` — его значением по умолчанию будет `NULL`.
 
 **ON UPDATE / ON DELETE — поведение внешнего ключа:**
 
@@ -105,6 +129,14 @@ FOREIGN KEY (author_id) REFERENCES Authors(id)
     ON DELETE SET NULL  -- если автора удалили — author_id станет NULL
 ```
 
+**Требование к типам:** внешний ключ и поле, на которое он ссылается, должны иметь одинаковый тип данных. Для `INT`/`DECIMAL` и подобных типов с фиксированной точностью должны совпадать ещё размер и знак.
+
+**Составной внешний ключ** — если связь строится сразу по нескольким полям:
+
+```sql
+FOREIGN KEY (col1, col2) REFERENCES ParentTable(col1, col2)
+```
+
 **CONSTRAINT — именованное ограничение:**
 
 ```sql
@@ -113,6 +145,15 @@ CHECK (price > 0)
 
 -- С именем — удобно для последующего удаления
 CONSTRAINT price_positive CHECK (price > 0)
+```
+
+Автосгенерированное имя `CHECK` имеет шаблон `<таблица>_chk_<номер>` — например, первое безымянное ограничение в `Books` получит имя `Books_chk_1`, второе — `Books_chk_2`, и т.д. Именно это имя нужно, чтобы удалить CHECK через `DROP CHECK`.
+
+**Комбинирование ограничений** — несколько ключевых слов в одном поле пишутся через пробел, а не через запятую (запятая разделяет только сами поля):
+
+```sql
+id INT NOT NULL UNIQUE   -- ✅ через пробел
+id INT NOT NULL, UNIQUE  -- ❌ синтаксическая ошибка
 ```
 
 ---
@@ -325,6 +366,17 @@ CREATE TABLE Books (...);  -- ❌ ошибка при втором запуск�
 CREATE TABLE IF NOT EXISTS Books (...);  -- ✅
 ```
 
+**❌ AUTO_INCREMENT вместе с DEFAULT — несовместимы:**
+```sql
+id INT PRIMARY KEY AUTO_INCREMENT DEFAULT 1  -- ❌ ERROR
+id INT PRIMARY KEY AUTO_INCREMENT             -- ✅
+```
+
+**❌ Подзапрос в качестве DEFAULT — недопустим:**
+```sql
+price DECIMAL(10,2) DEFAULT (SELECT AVG(price) FROM Books)  -- ❌ ERROR
+```
+
 ---
 
 ## ✅ Главные правила
@@ -337,6 +389,7 @@ CREATE TABLE IF NOT EXISTS Books (...);  -- ✅
 ✅ `ON DELETE SET NULL` — внешний ключ станет NULL при удалении родителя  
 ✅ Несколько изменений в одном `ALTER TABLE` — через запятую  
 ✅ DDL необратимо — нет `ROLLBACK` для `DROP TABLE`  
+✅ Таблица обязана иметь хотя бы одно поле — без полей создать нельзя  
 
 ---
 
