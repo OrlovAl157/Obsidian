@@ -1,84 +1,45 @@
 ---
-tags: [sql, основы, select, where, like]
-difficulty: beginner
+tags:
+  - sql
+  - база_данных
+  - основы_sql
+  - статус/завершён
+уровень: базовый
+категория: SQL
 ---
 
-# 📊 Основы SQL — памятка
+# 📊 Основы SQL
 
-> Базовые команды SQL для извлечения, фильтрации и сортировки данных. `SELECT` и `FROM` — обязательная основа любого запроса. `WHERE` фильтрует строки, `ORDER BY` сортирует, `LIMIT` ограничивает количество. `LIKE` ищет по шаблону, `DISTINCT` убирает дубликаты.
+## 📌 Коротко
 
-## Содержание
+> Основные команды SQL (`SELECT`, `FROM`, `WHERE` и др.) служат для извлечения, фильтрации и сортировки данных. **SELECT и FROM** выбирают столбцы и таблицу-источник. **WHERE** фильтрует строки по условиям. **ORDER BY** сортирует результаты. **LIMIT** ограничивает количество строк. **Логические операторы** (`AND`, `OR`, `IN`, `NOT`) объединяют условия. **LIKE** выполняет поиск по шаблону с метасимволами `%` и `_`. **DISTINCT** возвращает только уникальные значения. **Вычисляемые поля** создаются прямо в SELECT. **CONCAT** объединяет строки.
 
-- [[#Справка|Справка]]
-- [[#📊 Порядок выполнения запроса|Порядок выполнения]]
-- [[#🟢 SELECT и FROM — извлечение данных|SELECT и FROM]]
-- [[#🔵 WHERE — фильтрация|WHERE]]
-- [[#🔴 AND / OR / IN / NOT|AND / OR / IN / NOT]]
-- [[#🟡 ORDER BY — сортировка|ORDER BY]]
-- [[#🟣 LIMIT — ограничение строк|LIMIT]]
-- [[#✂️ LIKE — поиск по шаблону|LIKE]]
-- [[#🔤 Регистрозависимость|Регистрозависимость]]
-- [[#📐 Вычисляемые поля|Вычисляемые поля]]
-- [[#🔗 CONCAT и CONCAT_WS|CONCAT и CONCAT_WS]]
-- [[#⚡ DISTINCT — уникальные значения|DISTINCT]]
-- [[#⚡ Быстрые примеры|Быстрые примеры]]
-- [[#⚠️ Частые ошибки|Частые ошибки]]
-- [[#✅ Главные правила|Главные правила]]
+-----
 
----
+## 📖 Теория
 
-## Справка
+-----
 
-| Команда | Назначение |
-|---|---|
-| `SELECT` | выбрать столбцы |
-| `FROM` | указать таблицу |
-| `WHERE` | отфильтровать строки |
-| `AND / OR` | объединить условия |
-| `IN / NOT IN` | проверить вхождение в список |
-| `BETWEEN` | проверить диапазон (включая границы) |
-| `IS NULL / IS NOT NULL` | проверить NULL |
-| `LIKE` | поиск по шаблону |
-| `ORDER BY ... ASC/DESC` | сортировать результат |
-| `LIMIT n` | ограничить количество строк |
-| `LIMIT offset, n` | пропустить offset строк, взять n |
-| `DISTINCT` | убрать дубликаты |
-| `CONCAT(...)` | объединить строки |
-| `CONCAT_WS(sep, ...)` | объединить строки через разделитель |
+### Основы SQL
 
----
+#### 1.1 Извлечение данных
 
-## 📊 Порядок выполнения запроса
+**Назначение.** Основные команды для выбора столбцов, источника данных и ограничения результатов.
 
-```
-SELECT столбцы          ← 3. выбираются столбцы
-FROM таблица            ← 1. выбирается таблица
-WHERE условие           ← 2. фильтруются строки
-ORDER BY поле           ← 5. сортируется результат
-LIMIT количество;       ← 6. ограничивается количество
+| Ключевое слово | Назначение | Пример |
+|---|---|---|
+| `SELECT` | Выбирает столбцы для вывода | `SELECT name, age` |
+| `FROM` | Указывает таблицу-источник | `FROM Users` |
+| `LIMIT` | Ограничивает число строк результата | `LIMIT 5` |
+| `LIMIT offset, n` | Пропускает offset строк и выводит n строк | `LIMIT 10, 5` |
 
-Порядок обработки:
-FROM → WHERE → SELECT → DISTINCT → ORDER BY → LIMIT
-```
+**Ключевые правила:**
+- `SELECT` и `FROM` обязательны в каждом запросе;
+- можно выбирать несколько столбцов через запятую;
+- `LIMIT` всегда идёт в конце запроса;
+- `LIMIT offset, n` пропускает первые offset строк, потом выводит n строк.
 
-**Важное:** псевдонимы из `SELECT AS` нельзя использовать в `WHERE` — там они ещё не существуют. В `ORDER BY` — можно.
-
----
-
-## 🟢 SELECT и FROM — извлечение данных
-
-```sql
--- Все столбцы
-SELECT * FROM Films;
-
--- Конкретные столбцы
-SELECT title, director FROM Films;
-
--- С псевдонимом
-SELECT title AS name, director AS author FROM Films;
-```
-
-**Пример — вывести название и режиссёра первых 5 фильмов:**
+**Пример.** Вывести названия и режиссёров первых 5 фильмов.
 
 ```sql
 SELECT title, director
@@ -86,138 +47,40 @@ FROM Films
 LIMIT 5;
 ```
 
+Результат:
 ```
-title            | director
------------------+---------------------
-Inception        | Christopher Nolan
-The Matrix       | Lana Wachowski
-Interstellar     | Christopher Nolan
-Pulp Fiction     | Quentin Tarantino
+title           | director
+————————————————————————————
+Inception       | Christopher Nolan
+The Matrix      | Lana Wachowski
+Interstellar    | Christopher Nolan
+Pulp Fiction    | Quentin Tarantino
 The Dark Knight  | Christopher Nolan
 ```
 
-**Важное:** порядок строк без `ORDER BY` не гарантирован. Порядок столбцов в результате совпадает с порядком в `SELECT`, не с порядком в таблице.
+**⚠️ Примечание.** Порядок строк без `ORDER BY` не гарантирован. Для предсказуемого результата используйте сортировку.
 
----
+-----
 
-## 🔵 WHERE — фильтрация
+#### 1.2 ORDER BY — сортировка
 
-```sql
--- Операторы сравнения
-SELECT * FROM Songs WHERE streams > 1000000;
-SELECT * FROM Films WHERE release_year != 2020;
-SELECT * FROM Films WHERE release_year <> 2020;  -- то же что !=
+**Назначение.** Оператор `ORDER BY` сортирует строки результирующей таблицы по одному или нескольким полям.
 
--- BETWEEN — диапазон (включая границы)
-SELECT * FROM Films WHERE release_year BETWEEN 2010 AND 2020;
--- эквивалентно: WHERE release_year >= 2010 AND release_year <= 2020
+| Ключевое слово | Назначение | Пример |
+|---|---|---|
+| `ORDER BY` | Сортирует строки результирующей таблицы | `ORDER BY release_date` |
+| `ORDER BY ... ASC` | Сортировка по возрастанию (по умолчанию) | `ORDER BY name ASC` |
+| `ORDER BY ... DESC` | Сортировка по убыванию | `ORDER BY place DESC` |
 
--- NULL — специальная проверка
-SELECT * FROM Users WHERE email IS NULL;
-SELECT * FROM Users WHERE email IS NOT NULL;
--- ❌ WHERE email = NULL — не работает!
-```
+**Ключевые правила:**
+- можно сортировать по нескольким полям одновременно;
+- `ASC` (по возрастанию) используется по умолчанию;
+- `DESC` (по убыванию) указывается явно;
+- в `ORDER BY` можно сортировать по псевдониму (`AS`) или исходному полю;
+- если поле переименовано в `SELECT`, можно сортировать по исходному, указав его как `table.column`;
+- `ORDER BY` идёт после `WHERE` и до `LIMIT`.
 
-**Пример — найти популярные песни:**
-
-```sql
-SELECT trackname, artist, streams
-FROM Songs
-WHERE streams > 100000;
-```
-
-```
-trackname        | artist      | streams
------------------+-------------+------------
-Blinding Lights  | The Weeknd  | 3400000000
-Shape of You     | Ed Sheeran  | 2500000000
-```
-
-**Пример с BETWEEN — фильмы 2010–2020:**
-
-```sql
-SELECT title, release_year
-FROM Films
-WHERE release_year BETWEEN 2010 AND 2020;
-```
-
-```
-title       | release_year
-------------+-------------
-Inception   | 2010
-Interstellar| 2014
-```
-
----
-
-## 🔴 AND / OR / IN / NOT
-
-```sql
--- AND — все условия должны быть истинны
-SELECT * FROM Songs
-WHERE streams > 50000 AND place <= 3;
-
--- OR — хотя бы одно условие
-SELECT * FROM Songs
-WHERE artist = 'Heart' OR artist = 'Kate Bush';
-
--- IN — вместо нескольких OR (короче и читабельнее)
-SELECT * FROM Songs
-WHERE artist IN ('Heart', 'Kate Bush', 'Fleetwood Mac');
-
--- NOT IN — исключить список
-SELECT * FROM Songs
-WHERE artist NOT IN ('Heart', 'Kate Bush');
-
--- NOT — отрицание
-SELECT * FROM Songs
-WHERE NOT artist = 'The Sounds';
-
--- Скобки для явного порядка
-SELECT * FROM Songs
-WHERE streams > 50000 AND (artist = 'Heart' OR artist = 'Kate Bush');
-```
-
-**Пример — найти популярные песни Heart или Kate Bush:**
-
-```sql
-SELECT trackname, artist, streams
-FROM Songs
-WHERE streams > 50000
-  AND artist IN ('Heart', 'Kate Bush');
-```
-
-```
-trackname              | artist    | streams
------------------------+-----------+---------
-Alone                  | Heart     | 500000
-Running Up That Hill   | Kate Bush | 1000000
-```
-
-**Приоритет:** `IN`, `NOT IN` → `NOT` → `AND` → `OR`. Используй скобки чтобы не ошибиться.
-
----
-
-## 🟡 ORDER BY — сортировка
-
-```sql
--- По возрастанию (по умолчанию)
-SELECT title FROM Films ORDER BY release_year;
-SELECT title FROM Films ORDER BY release_year ASC;  -- то же самое
-
--- По убыванию
-SELECT title FROM Films ORDER BY release_year DESC;
-
--- По нескольким полям
-SELECT title, release_year FROM Films
-ORDER BY release_year DESC, title ASC;
--- сначала по году (новые вперёд), при одинаковом годе — по названию A-Z
-
--- По псевдониму (можно в ORDER BY)
-SELECT title AS name FROM Films ORDER BY name;
-```
-
-**Пример — отсортировать фильмы по названию в порядке убывания:**
+**Пример.** Отсортировать фильмы по названию в порядке убывания.
 
 ```sql
 SELECT title AS name
@@ -225,62 +88,141 @@ FROM Films
 ORDER BY name DESC;
 ```
 
+Результат:
 ```
 name
---------------------
+————————————————————
+Pulp Fiction
 The Matrix
 The Dark Knight
-Pulp Fiction
-Interstellar
 Inception
+Interstellar
 ```
 
----
-
-## 🟣 LIMIT — ограничение строк
+**💡 Совет.** Сортировка по нескольким полям:
 
 ```sql
--- Первые 5 строк
-SELECT * FROM Films LIMIT 5;
-
--- Пропустить 10, взять следующие 5
-SELECT * FROM Films LIMIT 10, 5;
--- эквивалентно: LIMIT 5 OFFSET 10
-
--- Топ-3 самых прослушиваемых песни
-SELECT title, streams FROM Songs
-ORDER BY streams DESC
-LIMIT 3;
+SELECT title, release_date
+FROM Films
+ORDER BY release_date DESC, title ASC;
 ```
 
----
+Сначала сортирует по дате (новые в начале), потом по названию (A-Z).
 
-## ✂️ LIKE — поиск по шаблону
+-----
 
-| Метасимвол | Значение |
+#### 1.3 WHERE — фильтрация данных
+
+**Назначение.** Оператор `WHERE` отбирает строки, удовлетворяющие заданному условию.
+
+| Ключевое слово | Назначение |
 |---|---|
-| `%` | любая последовательность символов (0 и более) |
-| `_` | ровно один любой символ |
+| `WHERE` | Фильтрация строк по условию |
+| `WHERE ... =, !=, <>, <, <=, >, >=` | Сравнение с одиночным значением |
+| `WHERE ... BETWEEN ... AND ...` | Проверка попадания в диапазон (включая границы) |
+| `WHERE ... IS NULL` | Проверка на NULL |
+| `WHERE ... IS NOT NULL` | Проверка на не-NULL |
+
+**Ключевые правила:**
+- `WHERE` используется после `FROM` и до `ORDER BY` / `LIMIT`;
+- условия задаются с помощью операторов сравнения;
+- для проверки отсутствия значения используются `IS NULL` и `IS NOT NULL`;
+- псевдонимы полей (`AS`) в `WHERE` использовать **нельзя**;
+- `NULL` требует специальной проверки (`IS NULL`), обычное сравнение `= NULL` не работает;
+- оператор `<>` — аналог `!=` для обозначения "не равно".
+
+**Пример.** Выбрать песни с количеством прослушиваний больше 100000.
 
 ```sql
--- Начинается с 'The'
-SELECT * FROM Films WHERE title LIKE 'The%';
-
--- Содержит слово 'You'
-SELECT * FROM Songs WHERE trackname LIKE '%You%';
-
--- Заканчивается на 'ing'
-SELECT * FROM Songs WHERE trackname LIKE '%ing';
-
--- Ровно 3 символа потом пробел
-SELECT * FROM Songs WHERE trackname LIKE '___ %';
-
--- Поиск самого метасимвола % через ESCAPE
-SELECT * FROM Data WHERE value LIKE '%/%' ESCAPE '/';
--- / перед % означает: % — это буквальный символ, не метасимвол
+SELECT trackname, artist, streams
+FROM Songs
+WHERE streams > 100000;
 ```
 
-**Пример — найти песни содержащие слово "You":**
+Результат:
+```
+trackname          | artist           | streams
+—————————————————————————————————————————————————————
+Blinding Lights     | The Weeknd       | 3400000000
+Shape of You        | Ed Sheeran       | 2500000000
+```
+
+**Пример с BETWEEN.** Выбрать фильмы, выпущенные между 2010 и 2020 годами (включая границы).
+
+```sql
+SELECT title, release_date
+FROM Films
+WHERE release_date BETWEEN 2010 AND 2020;
+```
+
+-----
+
+#### 1.4 AND / OR / IN / NOT — логическая фильтрация
+
+**Назначение.** Логические операторы позволяют объединять и отрицать условия в `WHERE`.
+
+| Оператор | Назначение | Пример |
+|---|---|---|
+| `WHERE cond1 AND cond2` | Все условия истинны | `WHERE streams > 50000 AND place <= 3` |
+| `WHERE cond1 OR cond2` | Хотя бы одно условие истинно | `WHERE artist = 'Heart' OR artist = 'Kate Bush'` |
+| `WHERE col IN (a, b, c)` | Значение входит в список | `WHERE artist IN ('Heart','Kate Bush')` |
+| `WHERE NOT condition` | Отрицание условия | `WHERE NOT artist = 'The Sounds'` |
+| `WHERE col NOT IN (a, b, c)` | Значение не входит в список | `WHERE artist NOT IN ('Heart','Kate Bush')` |
+
+**Ключевые правила:**
+- **приоритет операторов:** `IN`, `NOT IN` → `NOT` → `AND` → `OR`;
+- `AND` имеет более высокий приоритет чем `OR`, поэтому его выполняют первым;
+- используйте скобки для явного указания порядка: `WHERE (a OR b) AND c`;
+- `IN` часто используется вместо нескольких условий `OR` для краткости;
+- `NOT IN` исключает значения из списка.
+
+**Пример.** Найти популярные песни художников Heart или Kate Bush.
+
+```sql
+SELECT trackname, artist, streams
+FROM Songs
+WHERE streams > 50000 AND (artist = 'Heart' OR artist = 'Kate Bush');
+```
+
+Или короче с `IN`:
+
+```sql
+SELECT trackname, artist, streams
+FROM Songs
+WHERE streams > 50000 AND artist IN ('Heart', 'Kate Bush');
+```
+
+Результат:
+```
+trackname          | artist      | streams
+————————————————————————————————————————————————
+Alone              | Heart       | 500000
+Running Up That Hill | Kate Bush | 1000000
+```
+
+**⚠️ Примечание.** `NOT IN` исключает `NULL` значения автоматически, поэтому логика работает интуитивно.
+
+-----
+
+#### 1.5 LIKE — шаблонный поиск
+
+**Назначение.** Оператор `LIKE` используется для поиска строк по заданному шаблону с использованием метасимволов.
+
+| Оператор | Назначение | Пример |
+|---|---|---|
+| `WHERE col LIKE 'text%'` | Строка начинается с заданного текста | `WHERE artist LIKE 'The%'` |
+| `WHERE col LIKE '%text%'` | Строка содержит заданный текст | `WHERE trackname LIKE '%You%'` |
+| `WHERE col LIKE '____%'` | Ровно заданное число символов в начале | `WHERE trackname LIKE '___ %'` |
+| `WHERE col LIKE pattern ESCAPE 'x'` | Поиск самого метасимвола | `WHERE value LIKE '__/%' ESCAPE '/'` |
+
+**Метасимволы:**
+- `%` — любая последовательность символов (0 и более);
+- `_` — ровно один любой символ;
+- метасимволы могут располагаться в любом месте шаблона;
+- `LIKE` применяется только к строковым полям;
+- по умолчанию `LIKE` не учитывает регистр.
+
+**Пример.** Найти все песни, в названии которых есть слово "You".
 
 ```sql
 SELECT trackname, artist
@@ -288,15 +230,16 @@ FROM Songs
 WHERE trackname LIKE '%You%';
 ```
 
+Результат:
 ```
 trackname            | artist
----------------------+-----------
+——————————————————————————————————
 All I Want Is You    | Barry White
-Do You Love Me       | The Contours
+Do You Love Me        | The Contours
 You And I            | Lady Gaga
 ```
 
-**Пример — название начинается ровно с 3 символов потом пробел:**
+**Пример с подстановочным символом.** Найти песни, название которых начинается ровно с трёх букв, потом пробел.
 
 ```sql
 SELECT trackname
@@ -304,65 +247,102 @@ FROM Songs
 WHERE trackname LIKE '___ %';
 ```
 
+Результат:
 ```
 trackname
------------------
+——————————————
 All I Want Is You
 One In A Million
 ```
 
-**Важное:** `LIKE` не учитывает регистр по умолчанию — `'the%'` найдёт `'The'`, `'THE'`, `'the'`.
+##### 1.5.1 Экранирование (ESCAPE)
 
----
+**Назначение.** Используется для поиска самих метасимволов (`%`, `_`) как обычных символов.
 
-## 🔤 Регистрозависимость
+| Оператор | Назначение | Пример |
+|---|---|---|
+| `WHERE col LIKE pattern ESCAPE 'x'` | Экранирующий символ отключает спецзначение метасимвола | `WHERE value LIKE '__%' ESCAPE '_'` |
 
-По умолчанию сравнения в SQL **не учитывают регистр**. Для учёта регистра — `BINARY`:
+**Ключевые правила:**
+- ключевое слово `ESCAPE` задаёт символ экранирования;
+- символ после `ESCAPE` отключает специальное значение метасимвола;
+- часто используют `/`, `\` или любой редко встречающийся символ.
+
+**Пример.** Найти записи, содержащие литеральный символ `%`.
 
 ```sql
--- Найти только с заглавной 'Y'
-SELECT * FROM Songs WHERE trackname LIKE BINARY '%You%';
--- 'You' найдётся, 'you' и 'YOU' — нет
-
--- Три способа (эквивалентны):
-WHERE trackname LIKE BINARY '%You%'
-WHERE trackname LIKE CAST('%You%' AS BINARY)
-WHERE trackname LIKE CONVERT('%You%', BINARY)
-
--- Работает и для оператора =
-WHERE artist = BINARY 'The Weeknd'   -- только точное совпадение регистра
+SELECT value
+FROM Data
+WHERE value LIKE '%/%' ESCAPE '/';
 ```
 
-| Синтаксис | Когда использовать |
+Результат:
+```
+value
+————————————
+100% profit
+50% discount
+```
+
+-----
+
+#### 1.6 Регистрозависимость
+
+**Назначение.** В SQL сравнение строк по умолчанию регистронезависимо (это относится как к `LIKE`, так и к оператору `=`).
+
+| Ключевое слово | Назначение | Пример |
+|---|---|---|
+| `CAST(... AS BINARY)` | Приведение строки к бинарному виду для учета регистра | `LIKE CAST('%You%' AS BINARY)` |
+| `CONVERT(..., BINARY)` | Альтернативная форма приведения | `LIKE CONVERT('%You%', BINARY)` |
+| `BINARY` | Сокращённая форма, чаще используется в рабочем коде | `LIKE BINARY '%You%'` |
+
+**Ключевые правила:**
+- если регистр важен, строку или шаблон необходимо явно привести к бинарному виду;
+- после приведения сравнение выполняется с учетом регистра;
+- **`CAST(... AS BINARY)`** — стандартный SQL-синтаксис, универсальный и наглядный;
+- **`CONVERT(..., BINARY)`** — альтернативная форма, часто используемая в MySQL;
+- в задачах регистрозависимости `CAST` и `CONVERT` эквивалентны;
+- **`BINARY`** напрямую — сокращённая форма, чаще встречается в рабочем коде, но менее универсальна.
+
+**Пример.** Поиск с учетом регистра (только с большой буквы).
+
+```sql
+SELECT trackname
+FROM Songs
+WHERE trackname LIKE BINARY '%You%';
+```
+
+Результат:
+```
+trackname
+————————————————————
+All I Want Is You
+You Are The One
+```
+
+Если использовать обычный `LIKE` (без `BINARY`), найдутся и "you", и "You", и "YOU".
+
+**💡 Идея.** SQL по умолчанию не учитывает регистр, поэтому, если регистр важен, это необходимо указать явно — через `BINARY`.
+
+-----
+
+#### 1.7 Вычисляемые поля
+
+**Назначение.** Вычисляемые поля — это поля, значения которых не хранятся в таблице, а вычисляются в запросе на основе других полей.
+
+| Аспект | Правило |
 |---|---|
-| `BINARY` | кратко, в рабочем коде |
-| `CAST(... AS BINARY)` | стандартный SQL, наглядно |
-| `CONVERT(..., BINARY)` | MySQL-синтаксис, альтернатива CAST |
+| Вычисление | Вычисляются при выполнении `SELECT` |
+| Содержание | Могут включать выражения и функции |
+| Сохранение | В таблице базы данных не сохраняются |
+| Операторы | Поддерживаются `+`, `-`, `*`, `/` |
+| NULL-поведение | Если один из операндов равен NULL, результат равен NULL |
+| WHERE | Псевдонимы вычисляемых полей нельзя использовать в WHERE |
+| ORDER BY | Псевдонимы вычисляемых полей можно использовать в ORDER BY |
 
----
+**Пример.** Магазин мерча «VIBE STORE». Для каждого товара известны цена и количество продаж. Рассчитаем выручку по каждому товару.
 
-## 📐 Вычисляемые поля
-
-```sql
--- Арифметика прямо в SELECT
-SELECT item,
-       price * quantity AS revenue
-FROM VibeStore;
-
--- ❌ Псевдоним нельзя в WHERE
-SELECT price * quantity AS revenue FROM VibeStore
-WHERE revenue > 5000;   -- ошибка!
-
--- ✅ Повторяй выражение в WHERE
-SELECT price * quantity AS revenue FROM VibeStore
-WHERE price * quantity > 5000;
-
--- ✅ Псевдоним можно в ORDER BY
-SELECT item, price * quantity AS revenue FROM VibeStore
-ORDER BY revenue DESC;
-```
-
-**Пример — рассчитать выручку по каждому товару:**
+Запрос:
 
 ```sql
 SELECT item,
@@ -370,183 +350,349 @@ SELECT item,
 FROM VibeStore;
 ```
 
+Исходные данные:
+
 ```
-item             | revenue
------------------+--------
-Vibe Hoodie      | 6000
-Soft Vibe Socks  | 3400
+item              | price | quantity
+—————————————————————————————————————
+Vibe Hoodie       | 50    | 120
+Soft Vibe Socks   | 10    | 340
 ```
 
-**Важное:** если один из операндов `NULL` — результат `NULL`.
+Результат:
 
----
+```
+item              | revenue
+——————————————————————————————
+Vibe Hoodie       | 6000
+Soft Vibe Socks   | 3400
+```
 
-## 🔗 CONCAT и CONCAT_WS
+**⚠️ Примечание.** Нельзя использовать новый псевдоним в WHERE:
 
 ```sql
--- CONCAT — объединить строки
-SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM Users;
--- 'John' + ' ' + 'Doe' → 'John Doe'
-
--- Если хотя бы один аргумент NULL — результат NULL
-SELECT CONCAT('Hello', NULL, '!');   -- → NULL
-
--- CONCAT_WS — с разделителем, игнорирует NULL
-SELECT CONCAT_WS(', ', item, color, size) AS description FROM Clothes;
-
--- CONCAT_WS игнорирует NULL значения (не разделитель!)
-SELECT CONCAT_WS(' | ', artist, trackname, genre) FROM Songs;
--- если genre = NULL → 'Artist | Track' (без лишнего |)
+SELECT price * quantity AS revenue
+FROM VibeStore
+WHERE revenue > 5000;   # ❌ ОШИБКА — revenue не существует в WHERE
 ```
 
-**Пример — получить описание товара одной строкой:**
+Правильный способ:
+
+```sql
+SELECT price * quantity AS revenue
+FROM VibeStore
+WHERE price * quantity > 5000;   # ✅ Повторяем выражение
+```
+
+А в `ORDER BY` использование псевдонима допустимо:
+
+```sql
+SELECT item, price * quantity AS revenue
+FROM VibeStore
+ORDER BY revenue DESC;   # ✅ Можно использовать псевдоним
+```
+
+-----
+
+#### 1.8 Объединение значений полей
+
+**Назначение.** Используется для объединения значений полей в одно строковое поле.
+
+| Ключевое слово | Назначение | Пример |
+|---|---|---|
+| `CONCAT(col1, col2, ...)` | Объединяет значения полей в одну строку без разделителя по умолчанию | `CONCAT(artist, trackname)` |
+| `CONCAT(col1, ' ', col2)` | Объединяет значения с явно заданным разделителем | `CONCAT(artist, ' - ', trackname)` |
+| `CONCAT_WS(sep, col1, col2, ...)` | Объединяет значения и вставляет разделитель sep между ними | `CONCAT_WS(' ', artist, trackname)` |
+
+**Ключевые правила:**
+- все аргументы неявно приводятся к строке;
+- если хотя бы один аргумент `NULL`, `CONCAT` возвращает `NULL`;
+- `CONCAT_WS` игнорирует `NULL`-значения (кроме разделителя);
+- разделитель в `CONCAT_WS` должен быть первым аргументом;
+- пробелы и спецсимволы задаются явно в строке.
+
+**Пример.** Пусть в таблице хранится информация о товарах: тип одежды, цвет и размер. Необходимо получить удобное для вывода описание товара в одной строке.
+
+Запрос:
 
 ```sql
 SELECT CONCAT_WS(', ', item, color, CONCAT('size ', size)) AS product
 FROM Clothes;
 ```
 
+Исходные данные:
+
+```
+item    | color | size
+————————————————————————————
+Hoodie  | black | M
+T-shirt | white | L
+```
+
+Результат:
+
 ```
 product
------------------------
+——————————————————————————————
 Hoodie, black, size M
 T-shirt, white, size L
 ```
 
----
-
-## ⚡ DISTINCT — уникальные значения
+**Пример с NULL.** Если одно из значений `NULL`, `CONCAT` вернёт `NULL`:
 
 ```sql
--- Уникальные исполнители
-SELECT DISTINCT artist FROM Songs ORDER BY artist;
-
--- Уникальные комбинации
-SELECT DISTINCT artist, genre FROM Songs ORDER BY artist;
-
--- С COUNT
-SELECT COUNT(DISTINCT artist) AS unique_artists FROM Songs;
-
--- DISTINCT обрабатывается после WHERE
-SELECT DISTINCT artist FROM Songs
-WHERE streams > 100000;
+SELECT CONCAT(artist, ' - ', trackname) AS full_name
+FROM Songs
+WHERE artist IS NULL;
 ```
 
-**Пример — уникальные исполнители:**
+Результат:
+
+```
+full_name
+—————————
+NULL
+```
+
+Но `CONCAT_WS` игнорирует `NULL`:
 
 ```sql
-SELECT DISTINCT artist FROM Songs ORDER BY artist;
+SELECT CONCAT_WS(' | ', artist, trackname, genre) AS full_name
+FROM Songs;
 ```
+
+Если `genre = NULL`, результат всё равно будет "Artist | Track".
+
+-----
+
+#### 1.9 DISTINCT — получение уникальных значений
+
+**Назначение.** Ключевое слово `DISTINCT` удаляет дубликаты из результата запроса, оставляя только уникальные значения.
+
+| Ключевое слово | Назначение | Пример |
+|---|---|---|
+| `SELECT DISTINCT` | Выбирает только уникальные строки | `SELECT DISTINCT artist FROM Songs` |
+| `DISTINCT col1, col2` | Уникальность по комбинации нескольких столбцов | `SELECT DISTINCT artist, genre FROM Songs` |
+
+**Ключевые правила:**
+- `DISTINCT` ставится сразу после `SELECT`;
+- может применяться к одному или нескольким столбцам;
+- при нескольких столбцах уникальность определяется по их комбинации;
+- `DISTINCT` обрабатывается до `ORDER BY` и `LIMIT`;
+- `NULL` считается значением и включается в результаты;
+- использование `DISTINCT` может снизить производительность на больших таблицах.
+
+**Пример.** Получить список всех уникальных исполнителей из таблицы песен.
+
+Запрос:
+
+```sql
+SELECT DISTINCT artist
+FROM Songs
+ORDER BY artist;
+```
+
+Исходные данные:
 
 ```
 artist
----------------
+————————————————
+The Weeknd
+Ed Sheeran
+The Weeknd
+Billie Eilish
+Ed Sheeran
+```
+
+Результат:
+
+```
+artist
+————————————————
 Billie Eilish
 Ed Sheeran
 The Weeknd
 ```
 
-**Пример — уникальные комбинации исполнителя и жанра:**
+**Пример с несколькими столбцами.** Найти все уникальные комбинации исполнителя и жанра.
+
+Запрос:
 
 ```sql
-SELECT DISTINCT artist, genre FROM Songs ORDER BY artist, genre;
+SELECT DISTINCT artist, genre
+FROM Songs
+ORDER BY artist, genre;
 ```
+
+Исходные данные:
 
 ```
 artist          | genre
-----------------+-------------
+——————————————————————————
+The Weeknd      | Pop
+The Weeknd      | Synth-pop
+Ed Sheeran      | Pop
+Ed Sheeran      | Pop
+Billie Eilish   | Alternative
+```
+
+Результат:
+
+```
+artist          | genre
+——————————————————————————
 Billie Eilish   | Alternative
 Ed Sheeran      | Pop
 The Weeknd      | Pop
 The Weeknd      | Synth-pop
 ```
 
+**Пример с COUNT.** Подсчитать количество уникальных исполнителей.
+
+Запрос:
+
+```sql
+SELECT COUNT(DISTINCT artist) AS unique_artists
+FROM Songs;
+```
+
+Результат:
+
+```
+unique_artists
+————————————————
+150
+```
+
+**💡 Совет.** `DISTINCT` полезен для исследования данных:
+- найти все значения столбца;
+- определить диапазон уникальных значений;
+- найти ошибки в данных (неожиданные комбинации).
+
+**⚠️ Примечание.** `DISTINCT` работает после фильтрации `WHERE`, поэтому:
+
+```sql
+SELECT DISTINCT artist
+FROM Songs
+WHERE streams > 100000
+ORDER BY artist;
+```
+
+Вернёт исполнителей песен **с более чем 100000 прослушиваний**, а не всех исполнителей.
+
 ---
 
-## ⚡ Быстрые примеры
+## 📝 Примечания
+
+### Полная таблица — все основные команды SQL
+
+| Команда | Назначение |
+|---|---|
+| `SELECT` | Выбор столбцов |
+| `FROM` | Источник данных |
+| `WHERE` | Фильтрация строк |
+| `AND / OR / IN / NOT` | Логические операторы |
+| `LIKE` | Поиск по шаблону |
+| `ORDER BY` | Сортировка |
+| `LIMIT` | Ограничение строк |
+| `DISTINCT` | Уникальные значения |
+| `CONCAT / CONCAT_WS` | Объединение строк |
+| `BETWEEN` | Диапазон значений |
+| `IS NULL / IS NOT NULL` | Проверка NULL |
+
+### Порядок выполнения команд в запросе
+
+```
+SELECT столбцы
+FROM таблица
+WHERE условие
+ORDER BY поле
+LIMIT кол-во;
+```
+
+1. `FROM` — выбирается таблица;
+2. `WHERE` — фильтруются строки;
+3. `SELECT` — выбираются столбцы;
+4. `DISTINCT` — удаляются дубликаты;
+5. `ORDER BY` — сортируются результаты;
+6. `LIMIT` — ограничивается количество строк.
+
+---
+
+## 💻 Быстрая шпаргалка
 
 ```sql
 -- Базовый запрос
-SELECT name, age FROM Users WHERE age > 18 ORDER BY age DESC LIMIT 10;
+SELECT name, age
+FROM Users;
 
--- С IN и BETWEEN
-SELECT * FROM Songs
-WHERE artist IN ('The Weeknd', 'Ed Sheeran')
-  AND streams BETWEEN 1000000 AND 5000000;
+-- С фильтрацией
+SELECT name, age
+FROM Users
+WHERE age > 18;
 
--- Вычисляемое поле + сортировка
-SELECT item, price * quantity AS revenue
-FROM VibeStore
-ORDER BY revenue DESC
-LIMIT 5;
+-- С сортировкой
+SELECT name, age
+FROM Users
+WHERE age > 18
+ORDER BY age DESC;
 
--- LIKE с ESCAPE
-SELECT * FROM Products WHERE code LIKE '%\_%' ESCAPE '\';
+-- С ограничением
+SELECT name, age
+FROM Users
+WHERE age > 18
+ORDER BY age DESC
+LIMIT 10;
 
--- DISTINCT + COUNT
-SELECT COUNT(DISTINCT country) AS countries FROM Users;
+-- С уникальными значениями
+SELECT DISTINCT country
+FROM Users
+ORDER BY country;
 
--- Объединение строк
-SELECT CONCAT_WS(' - ', artist, trackname) AS song FROM Songs;
+-- С вычисляемым полем
+SELECT name, 
+       birth_year,
+       2026 - birth_year AS age
+FROM Users;
 
--- Регистрозависимый поиск
-SELECT * FROM Users WHERE email LIKE BINARY '%@Gmail.com';
+-- С объединением строк
+SELECT CONCAT_WS(' ', first_name, last_name) AS full_name
+FROM Users;
+
+-- С логическими операторами
+SELECT name, age
+FROM Users
+WHERE (age > 18 AND country = 'USA') 
+   OR (age > 21 AND country = 'UK');
+
+-- С поиском по шаблону
+SELECT title
+FROM Films
+WHERE title LIKE 'The%';
+
+-- С экранированием
+SELECT value
+FROM Data
+WHERE value LIKE '%/%' ESCAPE '/';
+
+-- С регистрозависимостью
+SELECT trackname
+FROM Songs
+WHERE trackname LIKE BINARY '%You%';
 ```
-
----
-
-## ⚠️ Частые ошибки
-
-**❌ Сравнение с NULL через =:**
-```sql
-WHERE email = NULL    -- ❌ всегда FALSE
-WHERE email IS NULL   -- ✅
-```
-
-**❌ Псевдоним в WHERE:**
-```sql
-SELECT price * 0.9 AS discounted FROM Books
-WHERE discounted < 10;     -- ❌ ошибка!
-WHERE price * 0.9 < 10;    -- ✅ повтори выражение
-```
-
-**❌ Приоритет AND и OR без скобок:**
-```sql
-WHERE age > 18 OR city = 'Moscow' AND country = 'Russia'
--- AND выполнится первым — результат неожиданный!
-WHERE age > 18 OR (city = 'Moscow' AND country = 'Russia')  -- ✅
-```
-
-**❌ LIKE без % — работает как =:**
-```sql
-WHERE title LIKE 'Inception'    -- найдёт только точное совпадение
-WHERE title LIKE '%Inception%'  -- найдёт где встречается ✅
-```
-
----
-
-## ✅ Главные правила
-
-✅ `SELECT` и `FROM` — обязательны в каждом запросе  
-✅ Порядок выполнения: `FROM → WHERE → SELECT → DISTINCT → ORDER BY → LIMIT`  
-✅ Псевдоним из `SELECT AS` — нельзя в `WHERE`, можно в `ORDER BY`  
-✅ `NULL` проверяй через `IS NULL` / `IS NOT NULL`, не через `=`  
-✅ `IN` — короче нескольких `OR`, читабельнее  
-✅ `AND` приоритетнее `OR` — используй скобки при сомнении  
-✅ `LIKE` не учитывает регистр — добавь `BINARY` если важно  
-✅ `%` — любая последовательность, `_` — один символ  
-✅ `CONCAT` + `NULL` = `NULL`, `CONCAT_WS` игнорирует `NULL`  
-✅ `DISTINCT` по нескольким столбцам — уникальность по комбинации  
 
 ---
 
 ## 🔗 Связанные темы
 
-- [[02 — ⚖️ Операторы и условия]]
-- [[03 — 📊 SELECT - основы]]
-- [[01 — 🔤 Текстовые функции]]
-- [[06 — 🧮 GROUP BY и HAVING]]
+- Agriggate функции (COUNT, SUM, AVG, MIN, MAX)
+- JOIN — объединение таблиц
+- GROUP BY — группировка данных
+- HAVING — фильтрация групп
+- Подзапросы (Subqueries)
+
+## ❓ Вопросы / Непонятное
 
 ---
 
-#sql/основы #select #where #like
+*Памятка составлена для быстрого повторения основных концепций SQL. Для полного обучения рекомендуется изучить дополнительные ресурсы и практиковать на реальных базах данных.*
