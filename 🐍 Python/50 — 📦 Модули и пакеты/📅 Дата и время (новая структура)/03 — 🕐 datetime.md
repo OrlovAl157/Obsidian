@@ -23,6 +23,24 @@ tags:
 
 ---
 
+## Справка
+
+| Что нужно | Код |
+|---|---|
+| Сейчас (локально) | `datetime.now()` |
+| Сейчас (UTC) | `datetime.now(timezone.utc)` |
+| Конкретные дата и время | `datetime(2024, 12, 31, 23, 59, 59)` |
+| Из строки по формату | `datetime.strptime('31.12.2024', '%d.%m.%Y')` |
+| Из ISO-строки | `datetime.fromisoformat('2024-12-31 23:59:59')` |
+| Из Unix timestamp | `datetime.fromtimestamp(1704063599)` |
+| В Unix timestamp | `dt.timestamp()` |
+| Собрать из date + time | `datetime.combine(d, t)` |
+| Достать только дату | `dt.date()` |
+| Достать только время | `dt.time()` |
+| В свой формат | `dt.strftime('%d.%m.%Y')` |
+
+---
+
 ## 🟢 Создание
 
 ```python

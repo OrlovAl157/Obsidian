@@ -21,6 +21,19 @@ tags:
 
 ---
 
+## Справка
+
+| Что нужно | Код |
+|---|---|
+| Unix timestamp сейчас | `time.time()` |
+| Пауза выполнения | `time.sleep(2)` |
+| Точный замер интервала | `time.perf_counter()` |
+| Локальное время как структура | `time.localtime()` |
+| Форматирование | `time.strftime('%d.%m.%Y', time.localtime())` |
+| Парсинг строки | `time.strptime(s, '%d.%m.%Y')` |
+
+---
+
 ## 🟢 time.time — Unix timestamp
 
 ```python
