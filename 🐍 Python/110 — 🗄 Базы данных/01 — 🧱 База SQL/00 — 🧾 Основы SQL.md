@@ -81,7 +81,25 @@ SELECT title AS name, director AS author FROM Films;
 SELECT title, release_year AS year FROM Films;
 ```
 
-**Порядок столбцов в результате** совпадает с порядком в `SELECT`, не с порядком в таблице.
+**Пример — вывести название и режиссёра первых 5 фильмов:**
+
+```sql
+SELECT title, director
+FROM Films
+LIMIT 5;
+```
+
+```
+title            | director
+-----------------+----------------------
+Inception        | Christopher Nolan
+The Matrix       | Lana Wachowski
+Interstellar     | Christopher Nolan
+Pulp Fiction     | Quentin Tarantino
+The Dark Knight  | Christopher Nolan
+```
+
+**Важное:** порядок строк без `ORDER BY` не гарантирован. Порядок столбцов в результате совпадает с порядком в `SELECT`, не с порядком в таблице.
 
 ---
 
@@ -103,9 +121,30 @@ SELECT * FROM Users WHERE email IS NOT NULL;
 -- ❌ WHERE email = NULL — не работает!
 ```
 
----
+**Пример — найти популярные песни:**
 
-## 🔴 AND / OR / IN / NOT
+```sql
+SELECT trackname, artist, streams
+FROM Songs
+WHERE streams > 100000;
+```
+
+```
+trackname        | artist      | streams
+-----------------+-------------+------------
+Blinding Lights  | The Weeknd  | 3400000000
+Shape of You     | Ed Sheeran  | 2500000000
+```
+
+**Пример с BETWEEN:**
+
+```sql
+SELECT title, release_year
+FROM Films
+WHERE release_year BETWEEN 2010 AND 2020;
+```
+
+---
 
 ```sql
 -- AND — все условия должны быть истинны
