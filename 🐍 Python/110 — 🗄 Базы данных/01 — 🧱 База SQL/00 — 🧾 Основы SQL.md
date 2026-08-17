@@ -76,9 +76,6 @@ SELECT title, director FROM Films;
 
 -- С псевдонимом
 SELECT title AS name, director AS author FROM Films;
-
--- Вычисляемый псевдоним
-SELECT title, release_year AS year FROM Films;
 ```
 
 **Пример — вывести название и режиссёра первых 5 фильмов:**
@@ -91,7 +88,7 @@ LIMIT 5;
 
 ```
 title            | director
------------------+----------------------
+-----------------+---------------------
 Inception        | Christopher Nolan
 The Matrix       | Lana Wachowski
 Interstellar     | Christopher Nolan
@@ -136,7 +133,7 @@ Blinding Lights  | The Weeknd  | 3400000000
 Shape of You     | Ed Sheeran  | 2500000000
 ```
 
-**Пример с BETWEEN:**
+**Пример с BETWEEN — фильмы 2010–2020:**
 
 ```sql
 SELECT title, release_year
@@ -144,7 +141,16 @@ FROM Films
 WHERE release_year BETWEEN 2010 AND 2020;
 ```
 
+```
+title       | release_year
+------------+-------------
+Inception   | 2010
+Interstellar| 2014
+```
+
 ---
+
+## 🔴 AND / OR / IN / NOT
 
 ```sql
 -- AND — все условия должны быть истинны
@@ -155,7 +161,7 @@ WHERE streams > 50000 AND place <= 3;
 SELECT * FROM Songs
 WHERE artist = 'Heart' OR artist = 'Kate Bush';
 
--- IN — вместо нескольких OR
+-- IN — вместо нескольких OR (короче и читабельнее)
 SELECT * FROM Songs
 WHERE artist IN ('Heart', 'Kate Bush', 'Fleetwood Mac');
 
@@ -170,6 +176,22 @@ WHERE NOT artist = 'The Sounds';
 -- Скобки для явного порядка
 SELECT * FROM Songs
 WHERE streams > 50000 AND (artist = 'Heart' OR artist = 'Kate Bush');
+```
+
+**Пример — найти популярные песни Heart или Kate Bush:**
+
+```sql
+SELECT trackname, artist, streams
+FROM Songs
+WHERE streams > 50000
+  AND artist IN ('Heart', 'Kate Bush');
+```
+
+```
+trackname              | artist    | streams
+-----------------------+-----------+---------
+Alone                  | Heart     | 500000
+Running Up That Hill   | Kate Bush | 1000000
 ```
 
 **Приоритет:** `IN`, `NOT IN` → `NOT` → `AND` → `OR`. Используй скобки чтобы не ошибиться.
@@ -193,8 +215,24 @@ ORDER BY release_year DESC, title ASC;
 
 -- По псевдониму (можно в ORDER BY)
 SELECT title AS name FROM Films ORDER BY name;
--- По исходному полю тоже можно
-SELECT title AS name FROM Films ORDER BY title;
+```
+
+**Пример — отсортировать фильмы по названию в порядке убывания:**
+
+```sql
+SELECT title AS name
+FROM Films
+ORDER BY name DESC;
+```
+
+```
+name
+--------------------
+The Matrix
+The Dark Knight
+Pulp Fiction
+Interstellar
+Inception
 ```
 
 ---
@@ -240,10 +278,40 @@ SELECT * FROM Songs WHERE trackname LIKE '___ %';
 -- Поиск самого метасимвола % через ESCAPE
 SELECT * FROM Data WHERE value LIKE '%/%' ESCAPE '/';
 -- / перед % означает: % — это буквальный символ, не метасимвол
-
--- LIKE не учитывает регистр по умолчанию
-WHERE title LIKE 'the%'   -- найдёт 'The', 'THE', 'the'
 ```
+
+**Пример — найти песни содержащие слово "You":**
+
+```sql
+SELECT trackname, artist
+FROM Songs
+WHERE trackname LIKE '%You%';
+```
+
+```
+trackname            | artist
+---------------------+-----------
+All I Want Is You    | Barry White
+Do You Love Me       | The Contours
+You And I            | Lady Gaga
+```
+
+**Пример — название начинается ровно с 3 символов потом пробел:**
+
+```sql
+SELECT trackname
+FROM Songs
+WHERE trackname LIKE '___ %';
+```
+
+```
+trackname
+-----------------
+All I Want Is You
+One In A Million
+```
+
+**Важное:** `LIKE` не учитывает регистр по умолчанию — `'the%'` найдёт `'The'`, `'THE'`, `'the'`.
 
 ---
 
@@ -281,12 +349,6 @@ SELECT item,
        price * quantity AS revenue
 FROM VibeStore;
 
--- Вычисление с несколькими полями
-SELECT name,
-       2026 - birth_year AS age,
-       salary * 12 AS annual_salary
-FROM Employees;
-
 -- ❌ Псевдоним нельзя в WHERE
 SELECT price * quantity AS revenue FROM VibeStore
 WHERE revenue > 5000;   -- ошибка!
@@ -298,6 +360,21 @@ WHERE price * quantity > 5000;
 -- ✅ Псевдоним можно в ORDER BY
 SELECT item, price * quantity AS revenue FROM VibeStore
 ORDER BY revenue DESC;
+```
+
+**Пример — рассчитать выручку по каждому товару:**
+
+```sql
+SELECT item,
+       price * quantity AS revenue
+FROM VibeStore;
+```
+
+```
+item             | revenue
+-----------------+--------
+Vibe Hoodie      | 6000
+Soft Vibe Socks  | 3400
 ```
 
 **Важное:** если один из операндов `NULL` — результат `NULL`.
@@ -316,11 +393,24 @@ SELECT CONCAT('Hello', NULL, '!');   -- → NULL
 
 -- CONCAT_WS — с разделителем, игнорирует NULL
 SELECT CONCAT_WS(', ', item, color, size) AS description FROM Clothes;
--- 'Hoodie', 'black', 'M' → 'Hoodie, black, M'
 
 -- CONCAT_WS игнорирует NULL значения (не разделитель!)
 SELECT CONCAT_WS(' | ', artist, trackname, genre) FROM Songs;
 -- если genre = NULL → 'Artist | Track' (без лишнего |)
+```
+
+**Пример — получить описание товара одной строкой:**
+
+```sql
+SELECT CONCAT_WS(', ', item, color, CONCAT('size ', size)) AS product
+FROM Clothes;
+```
+
+```
+product
+-----------------------
+Hoodie, black, size M
+T-shirt, white, size L
 ```
 
 ---
@@ -339,7 +429,36 @@ SELECT COUNT(DISTINCT artist) AS unique_artists FROM Songs;
 
 -- DISTINCT обрабатывается после WHERE
 SELECT DISTINCT artist FROM Songs
-WHERE streams > 100000;   -- уникальные исполнители популярных песен
+WHERE streams > 100000;
+```
+
+**Пример — уникальные исполнители:**
+
+```sql
+SELECT DISTINCT artist FROM Songs ORDER BY artist;
+```
+
+```
+artist
+---------------
+Billie Eilish
+Ed Sheeran
+The Weeknd
+```
+
+**Пример — уникальные комбинации исполнителя и жанра:**
+
+```sql
+SELECT DISTINCT artist, genre FROM Songs ORDER BY artist, genre;
+```
+
+```
+artist          | genre
+----------------+-------------
+Billie Eilish   | Alternative
+Ed Sheeran      | Pop
+The Weeknd      | Pop
+The Weeknd      | Synth-pop
 ```
 
 ---
@@ -400,8 +519,8 @@ WHERE age > 18 OR (city = 'Moscow' AND country = 'Russia')  -- ✅
 
 **❌ LIKE без % — работает как =:**
 ```sql
-WHERE title LIKE 'Inception'   -- найдёт только точное совпадение
-WHERE title LIKE '%Inception%' -- найдёт где встречается
+WHERE title LIKE 'Inception'    -- найдёт только точное совпадение
+WHERE title LIKE '%Inception%'  -- найдёт где встречается ✅
 ```
 
 ---
