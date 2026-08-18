@@ -57,6 +57,8 @@ datetime.fromisoformat('2024-12-31 23:59:59')         # готовый ISO-фо�
 datetime.fromtimestamp(1704063599)
 ```
 
+**Насчёт `strptime()` у `date`/`time`:** до Python 3.14 этот метод был доступен только у `datetime` — вызов `date.strptime(...)` или `time.strptime(...)` выбрасывал `AttributeError`. Начиная с Python 3.14, `strptime()` появился и у `date`, и у `time` напрямую, без необходимости создавать полный `datetime` и потом обрезать его до нужной части.
+
 ---
 
 ## 🔵 now() и today() — в чём разница
@@ -75,6 +77,14 @@ datetime.now(timezone(timedelta(hours=3)))          # своё смещение,
 ```
 
 `datetime.utcnow()` — устаревший способ получить UTC-время, вместо него используй `datetime.now(timezone.utc)`.
+
+**С Python 3.12** `utcnow()` официально устарел и готовится к удалению в будущих версиях. Взамен появилась укороченная константа `UTC` прямо в модуле `datetime` — она эквивалентна `timezone.utc`, но короче писать:
+
+```python
+from datetime import datetime, UTC
+
+datetime.now(UTC)   # то же самое, что datetime.now(timezone.utc), но компактнее
+```
 
 ---
 
