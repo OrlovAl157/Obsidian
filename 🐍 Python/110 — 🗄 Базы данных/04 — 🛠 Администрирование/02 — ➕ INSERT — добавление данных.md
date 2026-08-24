@@ -16,6 +16,7 @@ difficulty: intermediate
 - [[#🔴 Вычисляемые значения|Вычисляемые значения]]
 - [[#🟡 INSERT SET — альтернативный синтаксис|INSERT SET]]
 - [[#🟣 INSERT SELECT — данные из другой таблицы|INSERT SELECT]]
+- [[#🔗 INSERT SELECT с JOIN|INSERT SELECT с JOIN]]
 - [[#⚙️ IGNORE и REPLACE|IGNORE и REPLACE]]
 - [[#💡 Практические замечания|Практические замечания]]
 - [[#⚠️ Частые ошибки|Частые ошибки]]
@@ -207,6 +208,31 @@ FROM NewBooks;
 -- Если MAX(id) = 5, а NewBooks.id = 1 → новый id = 6
 -- Если MAX(id) = 5, а NewBooks.id = 2 → новый id = 7
 ```
+
+---
+
+## 🔗 INSERT SELECT с JOIN
+
+`INSERT ... SELECT` поддерживает полноценный `JOIN` — можно собирать данные из нескольких таблиц и вставлять результат в одну:
+
+```sql
+-- Архивировать книги британских авторов с именем автора
+INSERT INTO Archive (title, author_name, price)
+SELECT b.title, a.name, b.price
+FROM Books b
+JOIN Authors a ON b.author_id = a.id
+WHERE a.country = 'UK';
+
+-- JOIN с несколькими таблицами
+INSERT INTO Report (title, author_name, genre)
+SELECT b.title, a.name, g.name
+FROM Books b
+JOIN Authors a ON b.author_id = a.id
+JOIN Genres g ON b.genre_id = g.id
+WHERE b.price > 10;
+```
+
+Внутри SELECT работают все привычные конструкции: `JOIN`, `WHERE`, `GROUP BY`, `ORDER BY`, `LIMIT`, подзапросы.
 
 ---
 
