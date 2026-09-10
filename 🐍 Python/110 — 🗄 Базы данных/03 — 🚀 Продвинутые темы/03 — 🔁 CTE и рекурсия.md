@@ -26,13 +26,13 @@ difficulty: intermediate
 
 ## Справка
 
-| Синтаксис | Что делает |
-|---|---|
-| `WITH name AS (SELECT ...)` | простое CTE |
-| `WITH a AS (...), b AS (...)` | несколько CTE |
-| `WITH b AS (SELECT ... FROM a)` | CTE использует другое CTE |
-| `WITH RECURSIVE name AS (... UNION ALL ...)` | рекурсивное CTE |
-| `SET @@cte_max_recursion_depth := N` | изменить глубину рекурсии |
+| Синтаксис                                    | Что делает                |
+| -------------------------------------------- | ------------------------- |
+| `WITH name AS (SELECT ...)`                  | простое CTE               |
+| `WITH a AS (...), b AS (...)`                | несколько CTE             |
+| `WITH b AS (SELECT ... FROM a)`              | CTE использует другое CTE |
+| `WITH RECURSIVE name AS (... UNION ALL ...)` | рекурсивное CTE           |
+| `SET @@cte_max_recursion_depth := N`         | изменить глубину рекурсии |
 
 ---
 
