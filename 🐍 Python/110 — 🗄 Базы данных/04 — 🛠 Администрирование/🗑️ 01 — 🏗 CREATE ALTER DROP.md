@@ -22,23 +22,24 @@ difficulty: intermediate
 
 ## Справка
 
-| Оператор | Что делает |
-|---|---|
-| `CREATE TABLE t (...)` | создать таблицу |
-| `CREATE TABLE IF NOT EXISTS t (...)` | создать если не существует |
-| `DROP TABLE t` | удалить таблицу |
-| `DROP TABLE IF EXISTS t` | удалить если существует |
-| `RENAME TABLE t TO new_t` | переименовать таблицу |
-| `ALTER TABLE t ADD COLUMN col ...` | добавить поле |
-| `ALTER TABLE t DROP COLUMN col` | удалить поле |
-| `ALTER TABLE t RENAME COLUMN col TO new_col` | переименовать поле |
-| `ALTER TABLE t MODIFY COLUMN col ...` | изменить тип/ограничения поля |
-| `ALTER TABLE t CHANGE COLUMN old new ...` | переименовать и переопределить поле за один раз |
-| `ALTER TABLE t ADD PRIMARY KEY (col)` | добавить первичный ключ |
-| `ALTER TABLE t ADD FOREIGN KEY ...` | добавить внешний ключ |
-| `ALTER TABLE t ADD CHECK (...)` | добавить CHECK |
-| `SHOW CREATE TABLE t` | показать SQL создания таблицы |
-| `DESCRIBE t` | показать структуру таблицы (поля, типы, ключи) |
+| Оператор                                     | Что делает                                      |
+| -------------------------------------------- | ----------------------------------------------- |
+| `CREATE TABLE t (...)`                       | создать таблицу                                 |
+| `CREATE TABLE IF NOT EXISTS t (...)`         | создать если не существует                      |
+| `DROP TABLE t`                               | удалить таблицу                                 |
+| `DROP TABLE IF EXISTS t`                     | удалить если существует                         |
+| `RENAME TABLE t TO new_t`                    | переименовать таблицу                           |
+| `ALTER TABLE t ADD COLUMN col ...`           | добавить поле                                   |
+| `ALTER TABLE t DROP COLUMN col`              | удалить поле                                    |
+| `ALTER TABLE t RENAME COLUMN col TO new_col` | переименовать поле                              |
+| `ALTER TABLE t MODIFY COLUMN col ...`        | изменить тип/ограничения поля                   |
+| `ALTER TABLE t CHANGE COLUMN old new ...`    | переименовать и переопределить поле за один раз |
+| `ALTER TABLE t ADD PRIMARY KEY (col)`        | добавить первичный ключ                         |
+| `ALTER TABLE t ADD FOREIGN KEY ...`          | добавить внешний ключ                           |
+| `ALTER TABLE t ADD CHECK (...)`              | добавить CHECK                                  |
+| `SHOW CREATE TABLE t`                        | показать SQL создания таблицы                   |
+| `DESCRIBE t`                                 | показать структуру таблицы (поля, типы, ключи)  |
+| `SHOW TABLES`                                | показать все таблицы (базы даных)               |
 
 ---
 
