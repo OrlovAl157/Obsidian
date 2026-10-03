@@ -15,6 +15,7 @@ difficulty: intermediate
 - [[#🔵 Несколько CTE|Несколько CTE]]
 - [[#🔴 CTE внутри CTE|CTE внутри CTE]]
 - [[#🟡 CTE vs подзапрос|CTE vs подзапрос]]
+- [[#🎛 Оптимизация CTE MERGE и MATERIALIZE|Оптимизация CTE]]
 - [[#🟣 Рекурсивное CTE|Рекурсивное CTE]]
 - [[#⚙️ Настройка глубины рекурсии|Глубина рекурсии]]
 - [[#⚡ Быстрые примеры|Быстрые примеры]]
@@ -32,6 +33,7 @@ difficulty: intermediate
 | `WITH a AS (...), b AS (...)`                | несколько CTE             |
 | `WITH b AS (SELECT ... FROM a)`              | CTE использует другое CTE |
 | `WITH RECURSIVE name AS (... UNION ALL ...)` | рекурсивное CTE           |
+| `/*+ MERGE(cte) */` / `/*+ NO_MERGE(cte) */` | задать стратегию выполнения CTE |
 | `SET @@cte_max_recursion_depth := N`         | изменить глубину рекурсии |
 
 ---
@@ -185,6 +187,47 @@ JOIN Authors a ON b.author_id = a.id;
 | Переиспользование | ❌ нельзя | ✅ да (в одном запросе) |
 | Рекурсия | ❌ нет | ✅ да |
 | Производительность | одинаково | одинаково |
+
+---
+
+## 🎛 Оптимизация CTE: MERGE и MATERIALIZE
+
+При выполнении запроса с CTE СУБД сама выбирает одну из двух стратегий:
+
+| Стратегия | Что делает | Когда выгодна |
+|---|---|---|
+| **MERGE** | встраивает CTE в основной запрос, выполняет его **каждый раз**, когда на него ссылаются | CTE используется один раз, хорошо оптимизируется вместе с остальным запросом |
+| **MATERIALIZE** | выполняет CTE **один раз**, сохраняет результат во временной памяти, дальше читает готовые данные | CTE используется несколько раз в одном запросе — не считать одно и то же заново |
+
+Стратегию можно задать явно — хинтом-комментарием **сразу после `SELECT`**, перед списком полей:
+
+```sql
+WITH StephenKingBooks AS (
+    SELECT title, release_year
+    FROM Books INNER JOIN Authors ON Books.author_id = Authors.id
+    WHERE Authors.name = 'Stephen' AND Authors.surname = 'King'
+)
+
+-- Стратегия MERGE: CTE встраивается в основной запрос
+SELECT /*+ MERGE(StephenKingBooks) */ title
+FROM StephenKingBooks
+WHERE release_year = (SELECT MAX(release_year) FROM StephenKingBooks);
+
+-- Стратегия MATERIALIZE: CTE считается один раз, результат переиспользуется
+SELECT /*+ NO_MERGE(StephenKingBooks) */ title
+FROM StephenKingBooks
+WHERE release_year = (SELECT MAX(release_year) FROM StephenKingBooks);
+```
+
+> ⚠️ Хинт работает, только если стоит **сразу после `SELECT`**, перед перечислением полей. Если поставить его в другом месте (после полей, между ними) — он молча игнорируется, и СУБД выбирает стратегию сама, как будто хинта не было.
+
+```sql
+-- ❌ Хинт не на своём месте — не сработает
+SELECT title /*+ MERGE(StephenKingBooks) */
+FROM StephenKingBooks;
+```
+
+> 💡 Аналогия: `MERGE` — каждый раз заново считать формулу в Excel при пересчёте листа. `MATERIALIZE` — посчитать один раз, вставить как значение и больше не пересчитывать.
 
 ---
 
@@ -378,6 +421,12 @@ SELECT * FROM temp;  -- ❌ temp уже не существует!
 -- Используй INSERT ... WITH или субзапрос
 ```
 
+**❌ Хинт стратегии не на своём месте:**
+```sql
+SELECT title /*+ MERGE(cte) */ FROM cte;   -- ❌ после поля — проигнорирован
+SELECT /*+ MERGE(cte) */ title FROM cte;   -- ✅ сразу после SELECT
+```
+
 ---
 
 ## ✅ Главные правила
@@ -387,6 +436,7 @@ SELECT * FROM temp;  -- ❌ temp уже не существует!
 ✅ `WITH RECURSIVE` — обязательно условие выхода в рекурсивной части  
 ✅ `UNION ALL` — быстрее чем `UNION DISTINCT` для рекурсии  
 ✅ CTE живёт только в рамках одного запроса  
+✅ `MATERIALIZE` — CTE считается один раз, выгодно при многократном использовании; `MERGE` — встраивается в запрос заново при каждом обращении  
 ✅ Рекурсия по умолчанию ограничена 1000 шагами — меняй через `@@cte_max_recursion_depth`  
 ✅ CTE + оконные функции — мощная комбинация для сложной аналитики  
 
