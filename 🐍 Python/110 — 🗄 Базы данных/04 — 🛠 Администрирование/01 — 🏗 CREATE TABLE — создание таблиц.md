@@ -80,6 +80,19 @@ CREATE TABLE Books (
 );
 ```
 
+**Индекс прямо при создании таблицы** — необязательно создавать его потом отдельным `CREATE INDEX`, можно сразу внутри `CREATE TABLE`:
+
+```sql
+CREATE TABLE Books (
+    id     INT PRIMARY KEY AUTO_INCREMENT,
+    title  VARCHAR(100) NOT NULL,
+    author VARCHAR(100),
+    INDEX idx_author (author)   -- обычный индекс прямо при создании таблицы
+);
+```
+
+Подробнее про виды индексов и когда их создавать — [[05 — 🚀 Индексы]].
+
 ---
 
 ## 🔵 Ограничения и ключевые слова
