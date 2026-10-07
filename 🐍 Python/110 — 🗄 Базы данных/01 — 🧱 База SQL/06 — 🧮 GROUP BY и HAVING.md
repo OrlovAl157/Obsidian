@@ -23,6 +23,7 @@ tags: [sql, group-by, having, группировка, агрегаты]
 | --- | --- | --- |
 | `GROUP BY col` | Группирует строки по столбцу | `GROUP BY column` |
 | `GROUP BY col1, col2` | Группирует по нескольким столбцам | `GROUP BY col1, col2` |
+| `GROUP BY 1, 2` | Группирует по позиции столбца в SELECT | `GROUP BY 1` |
 | `HAVING condition` | Фильтрует группы (работает с агрегатами) | `HAVING COUNT(*) > 5` |
 | `SUM()`, `COUNT()`, `AVG()` | Агрегатные функции для группы | `SUM(amount)` |
 | `MIN()`, `MAX()` | Минимум и максимум в группе | `MIN(price)` |
