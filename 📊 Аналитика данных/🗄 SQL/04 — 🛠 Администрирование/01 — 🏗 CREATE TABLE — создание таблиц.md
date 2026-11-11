@@ -18,6 +18,10 @@ difficulty: intermediate
     - [[#🔗 FOREIGN KEY и ON UPDATE / ON DELETE|FOREIGN KEY и ON UPDATE/DELETE]]
     - [[#✔️ CHECK и CONSTRAINT|CHECK и CONSTRAINT]]
     - [[#➕ Комбинирование ограничений|Комбинирование ограничений]]
+- [[#📋 Создание таблицы на основе другой|Таблица на основе другой]]
+    - [[#🧬 LIKE — копия структуры|LIKE]]
+    - [[#🔎 AS SELECT — таблица из результата запроса|AS SELECT]]
+    - [[#📦 Полная копия: структура + данные|Полная копия]]
 - [[#⚡ Быстрые примеры|Быстрые примеры]]
 - [[#⚠️ Частые ошибки|Частые ошибки]]
 - [[#✅ Главные правила|Главные правила]]
@@ -32,6 +36,8 @@ difficulty: intermediate
 | `CREATE TABLE IF NOT EXISTS t (...)` | создать если не существует |
 | `SHOW CREATE TABLE t` | показать SQL создания таблицы |
 | `DESCRIBE t` | показать структуру таблицы (поля, типы, ключи) |
+| `CREATE TABLE new LIKE old` | копия структуры (с ключами и индексами), без данных |
+| `CREATE TABLE new AS SELECT ...` | таблица из результата запроса (данные есть, ключей нет) |
 
 ---
 
@@ -231,6 +237,78 @@ id INT NOT NULL, UNIQUE  -- ❌ синтаксическая ошибка
 
 ---
 
+## 📋 Создание таблицы на основе другой
+
+Два способа, и они копируют **разное**:
+
+| Способ | Структура | Данные | Индексы / PK |
+|---|---|---|---|
+| `CREATE TABLE new LIKE old` | ✅ копирует | ❌ пустая | ✅ копирует |
+| `CREATE TABLE new AS SELECT ...` | типы столбцов из запроса | ✅ результат запроса | ❌ не копирует |
+
+### 🧬 LIKE — копия структуры
+
+```sql
+CREATE TABLE Books_backup LIKE Books;
+-- та же структура, PRIMARY KEY, индексы, AUTO_INCREMENT, CHECK; строк нет
+-- ⚠️ FOREIGN KEY НЕ копируются
+```
+
+### 🔎 AS SELECT — таблица из результата запроса
+
+Результат `SELECT` становится новой таблицей. **Имена столбцов запроса становятся именами столбцов новой таблицы.** Если у столбца нет имени (константа, выражение, подзапрос), задай его псевдонимом `AS`.
+
+```sql
+CREATE TABLE Cheap_books AS
+SELECT id, title, price FROM Books WHERE price < 500;
+-- столбцы и данные берутся из запроса
+```
+
+**Константа в столбце** — одно и то же значение для всех строк:
+
+```sql
+-- Заказ: книги с остатком меньше 4, для всех количество 5
+CREATE TABLE ordering AS
+SELECT author, title, 5 AS amount   -- константа → столбец amount
+FROM book
+WHERE amount < 4;                   -- amount здесь — столбец book, не псевдоним
+
+SELECT * FROM ordering;
+-- Булгаков М.А.    | Мастер и Маргарита | 5
+-- Достоевский Ф.М. | Братья Карамазовы  | 5
+```
+
+**Вложенные запросы** допустимы и после `SELECT`, и после `WHERE`:
+
+```sql
+CREATE TABLE ordering AS
+SELECT author, title,
+    (SELECT ROUND(AVG(amount)) FROM book) AS amount  -- среднее по всей book
+FROM book
+WHERE amount < 4;
+-- → amount = 7 у обеих книг
+```
+
+**Пустая таблица с теми же столбцами:**
+
+```sql
+CREATE TABLE Books_empty AS
+SELECT * FROM Books WHERE 1 = 0;   -- условие всегда ложно
+```
+
+Ключи, индексы и `AUTO_INCREMENT` при `AS SELECT` не переносятся — добавляются потом через `ALTER TABLE` (см. [[01.1 — 🔧 ALTER, DROP, RENAME — изменение таблиц]]).
+
+### 📦 Полная копия: структура + данные
+
+```sql
+CREATE TABLE Books_copy LIKE Books;          -- 1. структура с ключами
+INSERT INTO Books_copy SELECT * FROM Books;  -- 2. данные
+```
+
+См. [[02 — ➕ INSERT — добавление данных]].
+
+---
+
 ## ⚡ Быстрые примеры
 
 ```sql
@@ -287,6 +365,14 @@ price DECIMAL(10,2) CHECK (price > cost)  -- ❌ может не сработа�
 CONSTRAINT price_above_cost CHECK (price > cost)  -- ✅
 ```
 
+**❌ Путаница с псевдонимом в WHERE при CREATE TABLE ... AS SELECT:**
+```sql
+CREATE TABLE ordering AS
+SELECT author, title, 5 AS amount
+FROM book
+WHERE amount < 4;   -- фильтрует по book.amount, а не по новому amount = 5
+```
+
 ---
 
 ## ✅ Главные правила
@@ -300,6 +386,7 @@ CONSTRAINT price_above_cost CHECK (price > cost)  -- ✅
 ✅ Внешний ключ и поле, на которое он ссылается — должны совпадать по типу  
 ✅ Несколько ограничений в поле — через пробел, не через запятую  
 ✅ Таблица обязана иметь хотя бы одно поле — без полей создать нельзя  
+✅ `LIKE` копирует структуру и индексы без данных, `AS SELECT` — данные, но не ключи  
 ✅ DDL необратимо — нет `ROLLBACK` для `CREATE TABLE`
 
 ---
